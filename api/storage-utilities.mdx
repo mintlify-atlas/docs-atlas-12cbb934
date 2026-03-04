@@ -39,7 +39,7 @@ saveDrawerState(key: string, open: boolean, snapPoint?: number): void
 
 ```svelte
 <script>
-  import { Drawer, saveDrawerState } from 'svelte-drawer';
+  import { Drawer, saveDrawerState } from '@abhivarde/svelte-drawer';
   
   let open = false;
   let activeSnapPoint = 0;
@@ -84,7 +84,7 @@ loadDrawerState(key: string): DrawerState | null
 
 ```svelte
 <script>
-  import { Drawer, loadDrawerState } from 'svelte-drawer';
+  import { Drawer, loadDrawerState } from '@abhivarde/svelte-drawer';
   import { onMount } from 'svelte';
   
   let open = false;
@@ -126,7 +126,7 @@ clearDrawerState(key: string): void
 
 ```svelte
 <script>
-  import { clearDrawerState } from 'svelte-drawer';
+  import { clearDrawerState } from '@abhivarde/svelte-drawer';
   
   function resetDrawerState() {
     clearDrawerState('my-drawer');

@@ -18,7 +18,7 @@ import type {
   DrawerPortalProps,
   DrawerHeaderProps,
   DrawerFooterProps,
-} from 'svelte-drawer';
+} from '@abhivarde/svelte-drawer';
 ```
 
 ## Type definitions
@@ -50,8 +50,8 @@ interface DrawerProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer } from 'svelte-drawer';
-  import type { DrawerProps } from 'svelte-drawer';
+  import { Drawer } from '@abhivarde/svelte-drawer';
+  import type { DrawerProps } from '@abhivarde/svelte-drawer';
   
   let props: Partial<DrawerProps> = {
     direction: 'bottom',
@@ -82,7 +82,7 @@ interface DrawerContentProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerContent } from 'svelte-drawer';
+  import { Drawer, DrawerContent } from '@abhivarde/svelte-drawer';
   
   const contentProps = {
     class: 'bg-white rounded-t-xl',
@@ -114,7 +114,7 @@ interface DrawerOverlayProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerOverlay } from 'svelte-drawer';
+  import { Drawer, DrawerOverlay } from '@abhivarde/svelte-drawer';
   
   const overlayProps = {
     class: 'bg-black/50',
@@ -144,7 +144,7 @@ interface DrawerHandleProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerHandle } from 'svelte-drawer';
+  import { Drawer, DrawerHandle } from '@abhivarde/svelte-drawer';
 </script>
 
 <Drawer open>
@@ -167,7 +167,7 @@ type DrawerVariant = "default" | "sheet" | "dialog" | "minimal" | "sidebar";
 
 ```svelte
 <script lang="ts">
-  import type { DrawerVariant } from 'svelte-drawer';
+  import type { DrawerVariant } from '@abhivarde/svelte-drawer';
   
   let selectedVariant: DrawerVariant = 'sheet';
   
@@ -195,8 +195,8 @@ interface DrawerVariantsProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerVariants } from 'svelte-drawer';
-  import type { DrawerVariantsProps } from 'svelte-drawer';
+  import { Drawer, DrawerVariants } from '@abhivarde/svelte-drawer';
+  import type { DrawerVariantsProps } from '@abhivarde/svelte-drawer';
   
   const variantProps: DrawerVariantsProps = {
     variant: 'sheet',
@@ -228,7 +228,7 @@ interface DrawerPortalProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerPortal } from 'svelte-drawer';
+  import { Drawer, DrawerPortal } from '@abhivarde/svelte-drawer';
   
   const portalProps = {
     container: '#portal-target', // or HTMLElement reference
@@ -262,8 +262,8 @@ interface DrawerHeaderProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerHeader } from 'svelte-drawer';
-  import type { DrawerHeaderProps } from 'svelte-drawer';
+  import { Drawer, DrawerHeader } from '@abhivarde/svelte-drawer';
+  import type { DrawerHeaderProps } from '@abhivarde/svelte-drawer';
   
   let open = true;
   
@@ -298,7 +298,7 @@ interface DrawerFooterProps {
 
 ```svelte
 <script lang="ts">
-  import { Drawer, DrawerFooter } from 'svelte-drawer';
+  import { Drawer, DrawerFooter } from '@abhivarde/svelte-drawer';
 </script>
 
 <Drawer open>
@@ -316,8 +316,8 @@ You can use these types to create strongly-typed wrapper components:
 
 ```svelte
 <script lang="ts">
-  import { Drawer } from 'svelte-drawer';
-  import type { DrawerProps } from 'svelte-drawer';
+  import { Drawer } from '@abhivarde/svelte-drawer';
+  import type { DrawerProps } from '@abhivarde/svelte-drawer';
   
   interface CustomDrawerProps extends DrawerProps {
     customProp?: string;
