@@ -1,0 +1,175 @@
+---
+title: 'DrawerOverlay'
+description: 'Background overlay that appears behind the drawer'
+icon: 'layer-group'
+---
+
+## Overview
+
+The `DrawerOverlay` component renders a semi-transparent backdrop behind the drawer. Clicking the overlay closes the drawer. It supports optional backdrop blur effects for a premium visual appearance.
+
+## Props
+
+<ParamField path="class" type="string">
+  CSS classes for styling the overlay. Typically includes positioning (`fixed inset-0`) and background color.
+  
+  ```svelte
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  ```
+</ParamField>
+
+<ParamField path="blur" type="boolean | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'" default="false">
+  Enable backdrop blur effect for a modern, premium look. Pass `true` for medium blur, or specify intensity.
+  
+  ```svelte
+  <!-- Default medium blur -->
+  <DrawerOverlay blur class="fixed inset-0 bg-black/40" />
+  
+  <!-- Large blur -->
+  <DrawerOverlay blur="lg" class="fixed inset-0 bg-black/40" />
+  ```
+</ParamField>
+
+## Blur Options
+
+The `blur` prop accepts the following values:
+
+- `false` - No blur (default)
+- `true` or `"md"` - Medium blur (`backdrop-blur-md`)
+- `"sm"` - Small blur (`backdrop-blur-sm`)
+- `"lg"` - Large blur (`backdrop-blur-lg`)
+- `"xl"` - Extra large blur (`backdrop-blur-xl`)
+- `"2xl"` - 2x extra large blur (`backdrop-blur-2xl`)
+- `"3xl"` - 3x extra large blur (`backdrop-blur-3xl`)
+
+## Usage Examples
+
+### Basic Overlay
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Click overlay to close</h2>
+  </DrawerContent>
+</Drawer>
+```
+
+### With Backdrop Blur
+
+```svelte
+<Drawer bind:open>
+  <!-- Medium blur (default) -->
+  <DrawerOverlay blur class="fixed inset-0 bg-black/40" />
+  
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Blurred Backdrop</h2>
+    <p>Notice the premium blur effect behind this drawer.</p>
+  </DrawerContent>
+</Drawer>
+```
+
+### Custom Blur Intensity
+
+```svelte
+<Drawer bind:open>
+  <!-- Extra large blur for dramatic effect -->
+  <DrawerOverlay blur="xl" class="fixed inset-0 bg-black/30" />
+  
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Extra Large Blur</h2>
+  </DrawerContent>
+</Drawer>
+```
+
+### Different Background Colors
+
+```svelte
+<!-- Dark overlay -->
+<DrawerOverlay class="fixed inset-0 bg-black/60" />
+
+<!-- Light overlay -->
+<DrawerOverlay class="fixed inset-0 bg-white/80" />
+
+<!-- Colored overlay -->
+<DrawerOverlay class="fixed inset-0 bg-blue-900/40" />
+
+<!-- With blur and color -->
+<DrawerOverlay blur="lg" class="fixed inset-0 bg-purple-900/30" />
+```
+
+## Behavior
+
+The overlay component:
+
+1. **Appears when drawer opens**: Fades in with opacity animation
+2. **Closes on click**: Clicking anywhere on the overlay closes the drawer
+3. **Keyboard accessible**: Pressing Enter or Space while focused closes the drawer
+4. **Auto-positioned**: Uses `z-index: 40` (below drawer content at z-index: 50)
+
+## Accessibility
+
+The component includes:
+
+- `role="button"` - Indicates the overlay is clickable
+- `tabindex="0"` - Makes the overlay keyboard-focusable
+- `aria-label="Close drawer"` - Provides accessible label
+- Keyboard handlers for Enter and Space keys
+
+## Styling
+
+The component automatically applies:
+
+- `fixed inset-0` - Covers entire viewport (must be in `class` prop)
+- `z-index: 40` - Positioned below drawer content
+- `cursor: pointer` - Indicates clickability
+- Dynamic opacity based on drawer state
+- Conditional backdrop blur classes
+
+### Opacity Recommendations
+
+**Without blur:**
+```svelte
+<DrawerOverlay class="fixed inset-0 bg-black/40" />
+```
+
+**With blur** (lighter overlay works better):
+```svelte
+<DrawerOverlay blur class="fixed inset-0 bg-black/20" />
+```
+
+**Strong blur** (very light overlay):
+```svelte
+<DrawerOverlay blur="2xl" class="fixed inset-0 bg-black/10" />
+```
+
+## Performance
+
+Backdrop blur can be GPU-intensive on lower-end devices. Consider:
+
+- Using `blur="sm"` or `blur="md"` for better performance
+- Testing on target devices before using `blur="2xl"` or `blur="3xl"`
+- Providing a fallback without blur for older browsers
+
+## Browser Support
+
+Backdrop blur (`backdrop-filter`) is supported in:
+
+- Chrome/Edge 76+
+- Firefox 103+
+- Safari 9+ (with `-webkit-` prefix, handled by Tailwind)
+- Opera 63+
+
+On unsupported browsers, the blur effect gracefully degrades to no blur.
+
+## Related Components
+
+- [Drawer](/api/drawer) - Main wrapper component
+- [DrawerContent](/api/drawer-content) - Content container
+- [DrawerPortal](/api/drawer-portal) - Portal rendering

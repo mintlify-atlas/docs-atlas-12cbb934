@@ -1,0 +1,487 @@
+---
+title: 'Styling Guide'
+description: 'Customize drawer appearance with Tailwind CSS and custom styles'
+---
+
+## Overview
+
+Svelte Drawer is designed to be fully customizable using Tailwind CSS classes. Every component accepts a `class` prop, allowing you to style the drawer to match your design system.
+
+## Basic Styling
+
+### Drawer Content
+
+The most common styling applies to `DrawerContent`:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer Content</h2>
+		<p>This is a drawer component.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+**Common classes:**
+- `fixed` - Fixed positioning
+- `bottom-0 left-0 right-0` - Position at bottom
+- `bg-white` - Background color
+- `rounded-t-lg` - Rounded top corners
+- `p-4` - Padding
+
+### Direction-Specific Positioning
+
+<CodeGroup>
+
+```svelte Bottom
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+	<!-- Bottom drawer -->
+</DrawerContent>
+```
+
+```svelte Top
+<DrawerContent class="fixed top-0 left-0 right-0 bg-white rounded-b-lg p-4">
+	<!-- Top drawer -->
+</DrawerContent>
+```
+
+```svelte Left
+<DrawerContent class="fixed left-0 top-0 bottom-0 w-80 bg-white p-4">
+	<!-- Left drawer -->
+</DrawerContent>
+```
+
+```svelte Right
+<DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+	<!-- Right drawer -->
+</DrawerContent>
+```
+
+</CodeGroup>
+
+## Overlay Styling
+
+### Basic Overlay
+
+```svelte
+<DrawerOverlay class="fixed inset-0 bg-black/40" />
+```
+
+### Custom Overlay Colors
+
+```svelte
+<!-- Dark overlay -->
+<DrawerOverlay class="fixed inset-0 bg-black/60" />
+
+<!-- Light overlay -->
+<DrawerOverlay class="fixed inset-0 bg-white/30" />
+
+<!-- Colored overlay -->
+<DrawerOverlay class="fixed inset-0 bg-blue-900/50" />
+
+<!-- No overlay background -->
+<DrawerOverlay class="fixed inset-0" />
+```
+
+### Backdrop Blur
+
+Add a premium blur effect to the overlay:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<!-- Default medium blur -->
+	<DrawerOverlay blur class="fixed inset-0 bg-black/40" />
+	
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Blurred Backdrop</h2>
+		<p>Notice the premium blur effect behind this drawer.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+**Available blur intensities:**
+
+```svelte
+<!-- Small blur -->
+<DrawerOverlay blur="sm" class="fixed inset-0 bg-black/40" />
+
+<!-- Medium blur (default when blur={true}) -->
+<DrawerOverlay blur="md" class="fixed inset-0 bg-black/40" />
+
+<!-- Large blur -->
+<DrawerOverlay blur="lg" class="fixed inset-0 bg-black/40" />
+
+<!-- Extra large blur -->
+<DrawerOverlay blur="xl" class="fixed inset-0 bg-black/40" />
+
+<!-- 2x extra large blur -->
+<DrawerOverlay blur="2xl" class="fixed inset-0 bg-black/40" />
+
+<!-- 3x extra large blur -->
+<DrawerOverlay blur="3xl" class="fixed inset-0 bg-black/40" />
+```
+
+The blur is implemented using Tailwind's backdrop blur utilities:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerOverlay.svelte:13-27
+const blurClass = $derived(() => {
+  if (!blur) return "";
+  if (blur === true) return "backdrop-blur-md";
+
+  const blurMap: Record<string, string> = {
+    sm: "backdrop-blur-sm",
+    md: "backdrop-blur-md",
+    lg: "backdrop-blur-lg",
+    xl: "backdrop-blur-xl",
+    "2xl": "backdrop-blur-2xl",
+    "3xl": "backdrop-blur-3xl",
+  };
+
+  return blurMap[blur as string] || "backdrop-blur-md";
+});
+```
+
+## Handle Styling
+
+The drag handle automatically adapts orientation but is fully customizable:
+
+```svelte
+<!-- Default gray handle -->
+<DrawerHandle class="mb-8" />
+
+<!-- Custom colored handle -->
+<DrawerHandle class="bg-blue-500 mb-8" />
+
+<!-- Larger handle -->
+<DrawerHandle class="w-16 h-2 mb-8" />
+
+<!-- Different color and size -->
+<DrawerHandle class="bg-gradient-to-r from-purple-500 to-pink-500 w-20 h-1 mb-8" />
+
+<!-- Invisible handle (still functional) -->
+<DrawerHandle class="opacity-0 mb-8" />
+```
+
+**Default styles:**
+- Horizontal (bottom/top): `w-12 h-1.5` (48px × 6px)
+- Vertical (left/right): `w-1.5 h-12` (6px × 48px)
+- Color: `bg-gray-300`
+- Cursor: `cursor-grab active:cursor-grabbing`
+
+## Color Schemes
+
+### Light Theme
+
+```svelte
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/20" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-6">
+		<DrawerHandle class="bg-gray-300 mb-6" />
+		<h2 class="text-gray-900 text-xl font-semibold">Light Theme</h2>
+		<p class="text-gray-600">Clean and bright design.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+### Dark Theme
+
+```svelte
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/60" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-gray-900 rounded-t-lg p-6">
+		<DrawerHandle class="bg-gray-600 mb-6" />
+		<h2 class="text-white text-xl font-semibold">Dark Theme</h2>
+		<p class="text-gray-300">Sleek and modern.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+### Gradient Theme
+
+```svelte
+<Drawer bind:open>
+	<DrawerOverlay blur="lg" class="fixed inset-0 bg-purple-900/30" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-t-2xl p-6">
+		<DrawerHandle class="bg-white/30 mb-6" />
+		<h2 class="text-white text-xl font-bold">Gradient Theme</h2>
+		<p class="text-white/90">Eye-catching design.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+## Shadows and Depth
+
+```svelte
+<!-- No shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+
+<!-- Small shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 shadow-sm">
+
+<!-- Medium shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 shadow-md">
+
+<!-- Large shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 shadow-lg">
+
+<!-- Extra large shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 shadow-xl">
+
+<!-- 2x extra large shadow -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 shadow-2xl">
+```
+
+## Border and Outlines
+
+```svelte
+<!-- Border on top -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-blue-500 rounded-t-lg p-4">
+
+<!-- Border all around -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white border-2 border-gray-200 rounded-t-lg p-4">
+
+<!-- Ring outline -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white ring-2 ring-blue-500 rounded-t-lg p-4">
+```
+
+## Height and Width
+
+### Fixed Heights
+
+```svelte
+<!-- Half screen -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 h-1/2 bg-white rounded-t-lg p-4">
+
+<!-- 70% of viewport -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 h-[70vh] bg-white rounded-t-lg p-4">
+
+<!-- Specific pixel height -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 h-96 bg-white rounded-t-lg p-4">
+```
+
+### Max Heights
+
+```svelte
+<!-- Auto height with max constraint -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-lg p-4">
+
+<!-- Flexible with scrolling -->
+<DrawerContent class="fixed bottom-0 left-0 right-0 max-h-screen overflow-y-auto bg-white rounded-t-lg p-4">
+```
+
+### Side Drawer Widths
+
+```svelte
+<!-- Small -->
+<DrawerContent class="fixed right-0 top-0 bottom-0 w-64 bg-white p-4">
+
+<!-- Medium -->
+<DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+
+<!-- Large -->
+<DrawerContent class="fixed right-0 top-0 bottom-0 w-96 bg-white p-4">
+
+<!-- Responsive width -->
+<DrawerContent class="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-white p-4">
+```
+
+## Animations and Transitions
+
+The drawer uses internal animations, but you can add additional CSS transitions:
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4 transition-colors duration-200">
+	<!-- Background color will transition smoothly -->
+</DrawerContent>
+
+<DrawerOverlay class="fixed inset-0 bg-black/40 transition-opacity duration-300" />
+```
+
+## Custom CSS
+
+For styles beyond Tailwind, use inline styles or global CSS:
+
+```svelte
+<DrawerContent 
+	class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4"
+	style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+>
+	<!-- Custom background gradient -->
+</DrawerContent>
+```
+
+Or with global CSS:
+
+```css
+/* app.css */
+.custom-drawer {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+```
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 custom-drawer rounded-t-lg p-4">
+	<!-- Uses custom CSS class -->
+</DrawerContent>
+```
+
+## Responsive Design
+
+Use Tailwind's responsive prefixes:
+
+```svelte
+<DrawerContent class="
+	fixed bottom-0 left-0 right-0 
+	bg-white rounded-t-lg 
+	p-4 sm:p-6 md:p-8
+	max-h-[95vh] sm:max-h-[85vh] md:max-h-[75vh]
+">
+	<h2 class="text-lg sm:text-xl md:text-2xl font-semibold">
+		Responsive Drawer
+	</h2>
+</DrawerContent>
+```
+
+## Z-Index Management
+
+The drawer manages z-index automatically:
+- Overlay: `z-index: 40`
+- Content: `z-index: 50`
+
+To adjust z-index in your layout:
+
+```svelte
+<!-- Lower z-index for nested context -->
+<DrawerOverlay class="fixed inset-0 bg-black/40" style="z-index: 30;" />
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4" style="z-index: 31;" />
+
+<!-- Higher z-index for modal-over-modal -->
+<DrawerOverlay class="fixed inset-0 bg-black/40" style="z-index: 60;" />
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4" style="z-index: 61;" />
+```
+
+<Note>
+  If you encounter z-index issues, consider using [portal rendering](/guides/portal) instead
+</Note>
+
+## Component Variants
+
+Using `DrawerVariants` provides pre-styled options:
+
+```svelte
+<DrawerVariants variant="sheet" class="!bg-gray-50">
+	<!-- Extends sheet variant with custom background -->
+</DrawerVariants>
+```
+
+Use `!` (important) to override variant defaults:
+
+```svelte
+<DrawerVariants variant="dialog" class="!max-w-2xl !h-[600px]">
+	<!-- Larger dialog variant -->
+</DrawerVariants>
+```
+
+## Best Practices
+
+<Tip>
+  Always include `fixed` positioning on `DrawerContent` for proper placement
+</Tip>
+
+<Tip>
+  Use `rounded-t-lg` for bottom drawers, `rounded-b-lg` for top drawers
+</Tip>
+
+<Tip>
+  Combine blur effects with semi-transparent overlays for a modern look
+</Tip>
+
+<Warning>
+  Avoid extremely bright backgrounds on overlays - they can be jarring
+</Warning>
+
+<Note>
+  Test your color schemes for accessibility - ensure sufficient contrast
+</Note>
+
+## Complete Styled Example
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle, DrawerHeader, DrawerFooter } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<button 
+	onclick={() => open = true}
+	class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+>
+	Open Styled Drawer
+</button>
+
+<Drawer bind:open>
+	<DrawerOverlay 
+		blur="lg" 
+		class="fixed inset-0 bg-gradient-to-br from-blue-900/40 to-purple-900/40" 
+	/>
+	<DrawerContent class="
+		fixed bottom-0 left-0 right-0 
+		bg-gradient-to-br from-white to-gray-50
+		rounded-t-3xl 
+		shadow-2xl
+		border-t-4 border-blue-500
+		max-h-[90vh]
+		flex flex-col
+	">
+		<DrawerHeader 
+			title="Beautiful Drawer" 
+			description="Fully customized with Tailwind CSS"
+			class="border-b border-gray-200"
+		/>
+		
+		<div class="flex-1 overflow-y-auto p-6">
+			<p class="text-gray-700 leading-relaxed">
+				This drawer showcases various styling techniques including
+				gradients, shadows, borders, and blur effects.
+			</p>
+		</div>
+		
+		<DrawerFooter class="border-t border-gray-200 bg-gray-50">
+			<button 
+				onclick={() => open = false}
+				class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+			>
+				Close
+			</button>
+		</DrawerFooter>
+	</DrawerContent>
+</Drawer>
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variants" icon="palette" href="/guides/variants">
+    Pre-styled drawer variants
+  </Card>
+  <Card title="Portal Rendering" icon="window" href="/guides/portal">
+    Solve z-index issues with portals
+  </Card>
+</CardGroup>

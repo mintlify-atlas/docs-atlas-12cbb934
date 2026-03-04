@@ -1,97 +1,172 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: Svelte Drawer
+description: A drawer component library for Svelte 5, inspired by Vaul
+mode: custom
 ---
 
-## Setting up
+<div className="relative overflow-hidden bg-gradient-to-br from-[#FF3E00] via-[#FF6B35] to-[#CC3100] dark:from-[#CC3100] dark:via-[#FF3E00] dark:to-[#FF6B35] py-20">
+  <div className="absolute inset-0 bg-black/40"></div>
+  <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+    <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+      <div className="lg:col-span-7">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+          Beautiful drawers for Svelte 5
+        </h1>
+        <p className="text-lg sm:text-xl text-white/90 max-w-2xl mb-8">
+          A powerful drawer component library with gesture-driven animations, snap points, and full accessibility support
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <a
+            href="/quickstart"
+            className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-[#FF3E00] font-semibold hover:bg-white/90 transition-colors"
+          >
+            Get Started
+          </a>
+          <a
+            href="/api/drawer"
+            className="inline-flex items-center px-6 py-3 rounded-lg border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 transition-colors"
+          >
+            API Reference
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+    Quick start
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Get up and running with Svelte Drawer in minutes
+  </p>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+  <Steps>
+    <Step title="Install the package">
+      Install Svelte Drawer using your preferred package manager:
 
-## Make it yours
+      <CodeGroup>
+      ```bash npm
+      npm install @abhivarde/svelte-drawer
+      ```
 
-Design a docs site that looks great and empowers your users.
+      ```bash yarn
+      yarn add @abhivarde/svelte-drawer
+      ```
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      ```bash pnpm
+      pnpm add @abhivarde/svelte-drawer
+      ```
+      </CodeGroup>
+    </Step>
 
-## Create beautiful pages
+    <Step title="Import components">
+      Import the drawer components into your Svelte 5 application:
 
-Everything you need to create world-class documentation.
+      ```svelte
+      import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+      ```
+    </Step>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    <Step title="Create your first drawer">
+      Add a basic drawer to your component:
 
-## Need inspiration?
+      ```svelte
+      <script>
+        import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+        let open = $state(false);
+      </script>
+
+      <button onclick={() => open = true}>
+        Open Drawer
+      </button>
+
+      <Drawer bind:open>
+        <DrawerOverlay class="fixed inset-0 bg-black/40" />
+        <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+          <DrawerHandle class="mb-8" />
+          <h2>Drawer Content</h2>
+          <p>This is a drawer component.</p>
+          <button onclick={() => open = false}>Close</button>
+        </DrawerContent>
+      </Drawer>
+      ```
+    </Step>
+  </Steps>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+    Key features
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Everything you need to build beautiful drawer experiences
+  </p>
+
+  <CardGroup cols={2}>
+    <Card title="Gesture-driven dragging" icon="hand" href="/guides/directions">
+      Smooth animations with mouse and touch support for natural interactions
+    </Card>
+    <Card title="Multiple directions" icon="arrows-up-down-left-right" href="/guides/directions">
+      Open drawers from bottom, top, left, or right with automatic handle orientation
+    </Card>
+    <Card title="Snap points" icon="layer-group" href="/guides/snap-points">
+      iOS-like multi-height drawers that snap to predefined positions
+    </Card>
+    <Card title="Prebuilt variants" icon="palette" href="/guides/variants">
+      Sheet, dialog, sidebar, and minimal variants ready to use
+    </Card>
+    <Card title="Portal rendering" icon="portal-enter" href="/guides/portal">
+      Escape z-index conflicts by rendering in a portal
+    </Card>
+    <Card title="Keyboard accessible" icon="keyboard" href="/guides/keyboard-accessibility">
+      Full keyboard navigation and focus management built-in
+    </Card>
+    <Card title="Persistent state" icon="floppy-disk" href="/guides/persistent-state">
+      Save drawer state across page reloads automatically
+    </Card>
+    <Card title="TypeScript support" icon="code" href="/api/typescript-types">
+      Comprehensive type definitions for all components and props
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+    Explore by topic
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Learn how to use Svelte Drawer in your projects
+  </p>
+
+  <CardGroup cols={3}>
+    <Card title="Guides" icon="book-open" href="/guides/directions">
+      Step-by-step guides for common use cases
+    </Card>
+    <Card title="Examples" icon="lightbulb" href="/examples/basic-drawer">
+      Real-world examples to get you started
+    </Card>
+    <Card title="API Reference" icon="terminal" href="/api/drawer">
+      Complete API documentation for all components
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="rounded-2xl border border-gray-200 dark:border-[#27272a] bg-gray-50 dark:bg-[#1a1d27] p-8 sm:p-12">
+    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      Ready to get started?
+    </h2>
+    <p className="text-base text-gray-600 dark:text-gray-400 mb-6 max-w-2xl">
+      Start building beautiful drawer experiences in your Svelte 5 applications today
+    </p>
+    <a
+      href="/quickstart"
+      className="inline-flex items-center px-6 py-3 rounded-lg bg-[#FF3E00] text-white font-semibold hover:bg-[#CC3100] transition-colors"
+    >
+      Get Started
+    </a>
+  </div>
+</div>

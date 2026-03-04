@@ -1,0 +1,156 @@
+---
+title: 'Custom Variants'
+description: 'Pre-styled drawer variants for common use cases'
+---
+
+# Custom Variants
+
+The `DrawerVariants` component provides pre-styled drawer layouts for common patterns. Choose from sheet, dialog, sidebar, minimal, or default variants.
+
+## What This Example Shows
+
+- Sheet variant (iOS-style bottom sheet)
+- Dialog variant (center modal)
+- Sidebar variant (navigation drawer)
+- Pre-configured styling and positioning
+- Easy switching between different drawer styles
+
+## Available Variants
+
+### Sheet Variant
+
+iOS-style bottom sheet with white background and rounded corners.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="sheet">
+		<div class="p-6">
+			<DrawerHandle class="mb-6" />
+			<h2>iOS-style Sheet</h2>
+			<p>Clean and modern bottom sheet design</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Features:**
+- White background
+- Rounded top corners
+- 85vh max height
+- Bottom positioning
+
+### Dialog Variant
+
+Center-positioned modal dialog style.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="dialog">
+		<div class="p-6">
+			<h2>Dialog Style</h2>
+			<p>Center-positioned modal dialog</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Features:**
+- Centered on screen
+- Modal appearance
+- Perfect for confirmations and alerts
+- No drag handle needed
+
+### Sidebar Variant
+
+Full-height side navigation drawer.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="right">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="sidebar">
+		<div class="p-6">
+			<DrawerHandle class="mb-4" />
+			<h2>Sidebar Navigation</h2>
+			<p>Side navigation drawer</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Features:**
+- Full viewport height
+- Fixed width (typically 320px)
+- Ideal for navigation menus
+- Works with left or right direction
+
+## All Variants
+
+| Variant | Description | Best For |
+|---------|-------------|----------|
+| `default` | Standard bottom drawer with gray background | General purpose |
+| `sheet` | iOS-style bottom sheet (white, rounded, 85vh) | Mobile-first content |
+| `dialog` | Center modal dialog style | Confirmations, alerts |
+| `minimal` | Simple bottom drawer without extra styling | Custom designs |
+| `sidebar` | Side navigation drawer (full height) | Navigation, settings |
+
+## Adding Custom Styles
+
+You can still add custom classes to any variant:
+
+```svelte
+<DrawerVariants variant="sheet" class="max-w-2xl mx-auto">
+	<!-- Content -->
+</DrawerVariants>
+```
+
+## Focus Management
+
+All variants include focus trap by default. Disable if needed:
+
+```svelte
+<DrawerVariants variant="sheet" trapFocus={false}>
+	<!-- Content -->
+</DrawerVariants>
+```
+
+## When to Use Each Variant
+
+### Use Sheet
+- Mobile-first applications
+- Bottom sheets with rich content
+- iOS-style interfaces
+
+### Use Dialog
+- Confirmation dialogs
+- Alert messages
+- Forms that need focus
+
+### Use Sidebar
+- Navigation menus
+- Settings panels
+- Filter drawers
+
+### Use Minimal
+- When you need full control over styling
+- Custom branded designs
+- Unique layout requirements

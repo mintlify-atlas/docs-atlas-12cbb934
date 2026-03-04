@@ -1,0 +1,380 @@
+---
+title: 'Persistent State'
+description: 'Save and restore drawer state across page reloads using localStorage'
+---
+
+## Overview
+
+Persistent state allows your drawer to remember whether it was open or closed across page reloads. You can also persist snap point positions, providing a seamless user experience.
+
+## Basic Usage
+
+Enable state persistence with the `persistState` and `persistKey` props:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer 
+	bind:open 
+	persistState={true}
+	persistKey="main-drawer"
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>This drawer remembers if it was open!</h2>
+		<p>Reload the page and it will restore its state.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+- `persistState={true}` - Enables state persistence
+- `persistKey="main-drawer"` - Unique identifier for this drawer (default: `"default"`)
+
+<Note>
+  Each drawer needs a unique `persistKey` if you have multiple drawers with persistence
+</Note>
+
+## Persisting Snap Points
+
+When using snap points, you can also persist the current snap position:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer 
+	bind:open 
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+	persistState={true}
+	persistKey="snap-drawer"
+	persistSnapPoint={true}
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Position is saved too!</h2>
+		<p>The snap point will be restored on reload.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+- `persistSnapPoint={true}` - Enables snap point persistence
+- Requires `persistState={true}` to be enabled
+
+## Programmatic State Management
+
+You can use utility functions to manually manage drawer state:
+
+### Clear Saved State
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, clearDrawerState } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	
+	function resetDrawer() {
+		clearDrawerState('main-drawer');
+		// Drawer will reset to default state on next load
+	}
+</script>
+
+<button onclick={resetDrawer}>Reset Drawer State</button>
+
+<Drawer bind:open persistState={true} persistKey="main-drawer">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Drawer Content</h2>
+	</DrawerContent>
+</Drawer>
+```
+
+### Save State Manually
+
+```svelte
+<script>
+	import { saveDrawerState } from '@abhivarde/svelte-drawer';
+
+	function saveCustomState() {
+		saveDrawerState('my-drawer', true, 0.5);
+		// Saves: open=true, snapPoint=0.5
+	}
+</script>
+```
+
+### Load State Manually
+
+```svelte
+<script>
+	import { loadDrawerState } from '@abhivarde/svelte-drawer';
+
+	function checkSavedState() {
+		const state = loadDrawerState('my-drawer');
+		if (state) {
+			console.log('Drawer was open:', state.open);
+			console.log('Snap point:', state.snapPoint);
+		}
+	}
+</script>
+```
+
+## Implementation Details
+
+### Storage Format
+
+State is saved to `localStorage` with the key format `svelte-drawer-{persistKey}`:
+
+```typescript /home/daytona/workspace/source/src/lib/utils/storage.ts:1-6
+interface DrawerState {
+  open: boolean;
+  snapPoint?: number;
+}
+
+const STORAGE_PREFIX = "svelte-drawer-";
+```
+
+### Save Function
+
+```typescript /home/daytona/workspace/source/src/lib/utils/storage.ts:8-25
+export function saveDrawerState(
+  key: string,
+  open: boolean,
+  snapPoint?: number
+): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    const state: DrawerState = { open };
+    if (snapPoint !== undefined) {
+      state.snapPoint = snapPoint;
+    }
+
+    localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(state));
+  } catch (error) {
+    console.warn("Failed to save drawer state:", error);
+  }
+}
+```
+
+### Load Function
+
+```typescript /home/daytona/workspace/source/src/lib/utils/storage.ts:27-39
+export function loadDrawerState(key: string): DrawerState | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const stored = localStorage.getItem(`${STORAGE_PREFIX}${key}`);
+    if (!stored) return null;
+
+    return JSON.parse(stored) as DrawerState;
+  } catch (error) {
+    console.warn("Failed to load drawer state:", error);
+    return null;
+  }
+}
+```
+
+### Clear Function
+
+```typescript /home/daytona/workspace/source/src/lib/utils/storage.ts:41-49
+export function clearDrawerState(key: string): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.removeItem(`${STORAGE_PREFIX}${key}`);
+  } catch (error) {
+    console.warn("Failed to clear drawer state:", error);
+  }
+}
+```
+
+### Automatic Saving
+
+The drawer automatically saves state when changes occur:
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:65-73
+$effect(() => {
+  if (persistState && stateLoaded) {
+    saveDrawerState(
+      persistKey,
+      open,
+      persistSnapPoint ? activeSnapPoint : undefined
+    );
+  }
+});
+```
+
+### Automatic Loading
+
+State is loaded when the component mounts:
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:39-56
+onMount(() => {
+  if (persistState && !stateLoaded) {
+    const savedState = loadDrawerState(persistKey);
+
+    if (savedState) {
+      open = savedState.open;
+
+      if (
+        persistSnapPoint &&
+        savedState.snapPoint !== undefined &&
+        snapPoints
+      ) {
+        activeSnapPoint = savedState.snapPoint;
+      }
+    }
+
+    stateLoaded = true;
+  }
+```
+
+## Multiple Drawers with Persistence
+
+You can have multiple drawers with different persistence keys:
+
+```svelte
+<script>
+	let drawer1Open = $state(false);
+	let drawer2Open = $state(false);
+</script>
+
+<Drawer bind:open={drawer1Open} persistState={true} persistKey="drawer-1">
+	<!-- First drawer -->
+</Drawer>
+
+<Drawer bind:open={drawer2Open} persistState={true} persistKey="drawer-2">
+	<!-- Second drawer - independent state -->
+</Drawer>
+```
+
+## Privacy Considerations
+
+<Warning>
+  State is stored in `localStorage`, which persists until manually cleared. Users in incognito/private mode may not have persistence.
+</Warning>
+
+To respect user privacy, you might want to add a setting:
+
+```svelte
+<script>
+	let open = $state(false);
+	let rememberState = $state(true);
+</script>
+
+<Drawer 
+	bind:open 
+	persistState={rememberState}
+	persistKey="main-drawer"
+>
+	<DrawerContent class="...">
+		<label>
+			<input type="checkbox" bind:checked={rememberState} />
+			Remember drawer state
+		</label>
+	</DrawerContent>
+</Drawer>
+```
+
+## Use Cases
+
+### Settings Panel
+
+```svelte
+<Drawer 
+	persistState={true} 
+	persistKey="settings-panel"
+	direction="right"
+>
+	<!-- User's settings panel stays open if they had it open -->
+</Drawer>
+```
+
+### Navigation Drawer
+
+```svelte
+<Drawer 
+	persistState={true} 
+	persistKey="nav-drawer"
+	direction="left"
+>
+	<!-- Navigation drawer remembers state -->
+</Drawer>
+```
+
+### Bottom Sheet with Preferred Height
+
+```svelte
+<Drawer 
+	persistState={true} 
+	persistKey="content-sheet"
+	snapPoints={[0.3, 0.6, 0.9]}
+	persistSnapPoint={true}
+>
+	<!-- Remembers user's preferred height -->
+</Drawer>
+```
+
+## Storage Utilities API
+
+### saveDrawerState
+
+```typescript
+saveDrawerState(key: string, open: boolean, snapPoint?: number): void
+```
+
+Manually save drawer state to localStorage.
+
+### loadDrawerState
+
+```typescript
+loadDrawerState(key: string): DrawerState | null
+```
+
+Manually load drawer state from localStorage. Returns `null` if no state exists.
+
+### clearDrawerState
+
+```typescript
+clearDrawerState(key: string): void
+```
+
+Remove saved drawer state from localStorage.
+
+## Best Practices
+
+<Tip>
+  Use descriptive `persistKey` values like `"settings-drawer"` instead of generic names
+</Tip>
+
+<Tip>
+  Provide a way to reset/clear state for user convenience
+</Tip>
+
+<Note>
+  Persistence works in SSR environments - it safely checks for `window` before accessing localStorage
+</Note>
+
+<Warning>
+  Don't rely on persistence for critical functionality - treat it as a UX enhancement
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer">
+    Persistence props documentation
+  </Card>
+  <Card title="Snap Points" icon="sliders" href="/guides/snap-points">
+    Learn about persisting snap positions
+  </Card>
+</CardGroup>

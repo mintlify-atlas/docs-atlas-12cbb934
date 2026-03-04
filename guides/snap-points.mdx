@@ -1,0 +1,279 @@
+---
+title: 'Snap Points'
+description: 'Create iOS-like multi-height drawers with snap points'
+---
+
+## Overview
+
+Snap points allow your drawer to rest at predefined heights, creating an iOS-style sheet experience. The drawer automatically snaps to the nearest point when released, providing precise control over drawer positioning.
+
+## Basic Usage
+
+Snap points are defined as an array of numbers between 0 and 1, where each value represents a percentage of the screen height.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer
+	bind:open
+	snapPoints={[0.25, 0.5, 0.9]}
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer with Snap Points</h2>
+		<p>Drag to see snapping behavior at 25%, 50%, and 90%</p>
+	</DrawerContent>
+</Drawer>
+```
+
+In this example:
+- `0.25` = 25% of screen height
+- `0.5` = 50% of screen height  
+- `0.9` = 90% of screen height
+
+## Tracking Active Snap Point
+
+Use `bind:activeSnapPoint` to track and control the current snap position:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer
+	bind:open
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Current position: {activeSnapPoint ? `${activeSnapPoint * 100}%` : 'None'}</h2>
+		<p>Drag to see the active snap point value.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+## Programmatic Control
+
+Change the snap point programmatically by updating `activeSnapPoint`:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer
+	bind:open
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer with Snap Points</h2>
+		
+		<!-- Programmatically change snap point -->
+		<div class="flex gap-2 mt-4">
+			<button onclick={() => activeSnapPoint = 0.25}>25%</button>
+			<button onclick={() => activeSnapPoint = 0.5}>50%</button>
+			<button onclick={() => activeSnapPoint = 0.9}>90%</button>
+		</div>
+	</DrawerContent>
+</Drawer>
+```
+
+## Snap Point Change Callback
+
+React to snap point changes with the `onSnapPointChange` callback:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+	
+	function handleSnapPointChange(point) {
+		console.log('Snapped to:', point);
+		// Perform actions based on snap point
+		if (point === 0.9) {
+			console.log('Drawer fully expanded!');
+		}
+	}
+</script>
+
+<Drawer
+	bind:open
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+	onSnapPointChange={handleSnapPointChange}
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer with Callback</h2>
+		<p>Check console when snapping.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+## How Snap Points Work
+
+### Initial Snap Point
+
+When the drawer opens, it automatically snaps to the **highest snap point** (largest value):
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:101-106
+if (snapPoints && snapPoints.length > 0) {
+  if (activeSnapPoint === undefined) {
+    activeSnapPoint = snapPoints[snapPoints.length - 1];
+  }
+  const snapPos = (1 - activeSnapPoint) * 100;
+  drawerPosition.set(snapPos, { duration: 220 });
+```
+
+### Finding Nearest Snap Point
+
+When released, the drawer snaps to the nearest point:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:34-52
+function findNearestSnapPoint(currentPos: number): number {
+  if (!drawer.snapPoints || drawer.snapPoints.length === 0) {
+    return currentPos;
+  }
+
+  const currentSnapValue = 1 - currentPos / 100;
+  let nearest = drawer.snapPoints[0];
+  let minDiff = Math.abs(currentSnapValue - nearest);
+
+  for (const snapPoint of drawer.snapPoints) {
+    const diff = Math.abs(currentSnapValue - snapPoint);
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearest = snapPoint;
+    }
+  }
+
+  return nearest;
+}
+```
+
+### Dismissing with Snap Points
+
+Dragging beyond the **lowest snap point + 30 pixels** dismisses the drawer:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:137-149
+if (drawer.snapPoints && drawer.snapPoints.length > 0) {
+  const nearestSnapPoint = findNearestSnapPoint(pos);
+  const snapPos = snapPointToPosition(nearestSnapPoint);
+
+  const lowestSnapPoint = Math.min(...drawer.snapPoints);
+  const lowestSnapPos = snapPointToPosition(lowestSnapPoint);
+
+  if (pos > lowestSnapPos + 30) {
+    drawer.closeDrawer();
+  } else {
+    drawer.drawerPosition.set(snapPos);
+    drawer.setActiveSnapPoint?.(nearestSnapPoint);
+  }
+}
+```
+
+## Common Patterns
+
+### Two-Height Sheet
+
+```svelte
+<Drawer bind:open snapPoints={[0.4, 0.9]}>
+	<!-- Peek at 40%, expand to 90% -->
+</Drawer>
+```
+
+### Three-Height Sheet
+
+```svelte
+<Drawer bind:open snapPoints={[0.25, 0.5, 0.9]}>
+	<!-- Small, medium, and large sizes -->
+</Drawer>
+```
+
+### Bottom Sheet with Peek
+
+```svelte
+<Drawer bind:open snapPoints={[0.15, 0.9]}>
+	<!-- Peek at 15%, expand to 90% -->
+</Drawer>
+```
+
+## Persistent Snap Points
+
+Combine snap points with state persistence to remember the user's preferred height:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer 
+	bind:open 
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+	persistState={true}
+	persistKey="my-snap-drawer"
+	persistSnapPoint={true}
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Position is saved!</h2>
+		<p>The snap point will be restored on reload.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+<Note>
+  Learn more about state persistence in the [Persistent State guide](/guides/persistent-state)
+</Note>
+
+## Best Practices
+
+<Tip>
+  Use 2-3 snap points maximum - too many options can feel overwhelming
+</Tip>
+
+<Tip>
+  Make the highest snap point at least 0.85 (85%) for comfortable viewing
+</Tip>
+
+<Tip>
+  Keep the lowest snap point above 0.15 (15%) to ensure visibility
+</Tip>
+
+<Warning>
+  Snap points only work with `direction="bottom"` and `direction="top"` drawers
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer">
+    Complete Drawer API with snap point props
+  </Card>
+  <Card title="Persistent State" icon="floppy-disk" href="/guides/persistent-state">
+    Save snap point positions across reloads
+  </Card>
+</CardGroup>

@@ -1,0 +1,81 @@
+---
+title: Installation
+description: Install Svelte Drawer in your Svelte 5 project
+---
+
+## Package Manager
+
+Install Svelte Drawer using your preferred package manager:
+
+<CodeGroup>
+
+```bash npm
+npm install @abhivarde/svelte-drawer
+```
+
+```bash yarn
+yarn add @abhivarde/svelte-drawer
+```
+
+```bash pnpm
+pnpm add @abhivarde/svelte-drawer
+```
+
+</CodeGroup>
+
+## Requirements
+
+Svelte Drawer requires Svelte 5 as a peer dependency.
+
+<Note>
+  **Svelte Version**: This library requires Svelte `^5.0.0` or higher. Make sure your project is using Svelte 5 before installing.
+</Note>
+
+### Check Your Svelte Version
+
+Verify your Svelte version in `package.json`:
+
+```json package.json
+{
+  "dependencies": {
+    "svelte": "^5.0.0"
+  }
+}
+```
+
+If you're on Svelte 4 or earlier, you'll need to upgrade to Svelte 5 first. See the [Svelte 5 migration guide](https://svelte.dev/docs/svelte/v5-migration-guide) for details.
+
+## Styling Setup
+
+Svelte Drawer works seamlessly with Tailwind CSS for styling. While not strictly required, the examples and prebuilt variants use Tailwind utility classes.
+
+<Tip>
+  If you're using Tailwind CSS, no additional setup is needed. The drawer components accept `class` props for custom styling.
+</Tip>
+
+For custom styling without Tailwind, you can use regular CSS classes or inline styles on any component.
+
+## Verify Installation
+
+After installation, verify that the package is correctly installed:
+
+```bash
+npm list @abhivarde/svelte-drawer
+```
+
+You should see the package version displayed in your terminal.
+
+## TypeScript Support
+
+Svelte Drawer includes full TypeScript definitions out of the box. No additional `@types` packages are needed.
+
+```typescript
+// Type definitions are automatically available
+import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+```
+
+## Next Steps
+
+<Card title="Quickstart Guide" icon="rocket" href="/quickstart">
+  Build your first drawer in under 5 minutes
+</Card>

@@ -1,0 +1,229 @@
+---
+title: 'Portal Rendering'
+description: 'Escape z-index conflicts by rendering drawers in a portal'
+---
+
+## Overview
+
+Portal rendering allows you to render the drawer in a different part of the DOM tree, typically at the end of the document body. This helps avoid z-index conflicts, stacking context issues, and overflow problems in complex layouts.
+
+## Basic Portal Usage
+
+Enable portal rendering with the `portal` prop:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open portal={true}>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Portal Drawer</h2>
+		<p>This drawer is rendered in a portal, preventing z-index issues.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+When `portal={true}`, the drawer is rendered at the end of `document.body` instead of where you declared it in your component tree.
+
+## Custom Portal Container
+
+You can specify a custom container for the portal using the `portalContainer` prop:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open portal={true} portalContainer="#custom-portal">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Custom Portal</h2>
+		<p>Rendered in a specific container.</p>
+	</DrawerContent>
+</Drawer>
+
+<div id="custom-portal"></div>
+```
+
+You can pass either:
+- A **CSS selector string** (e.g., `"#custom-portal"`, `".portal-root"`)
+- An **HTMLElement** reference
+
+## When to Use Portals
+
+### Z-Index Conflicts
+
+When your drawer appears behind other elements due to stacking context:
+
+```svelte
+<div class="relative z-10">
+	<!-- This creates a new stacking context -->
+	<div class="absolute z-50">
+		<!-- Drawer here might appear behind parent's siblings -->
+		<Drawer bind:open portal={true}>
+			<!-- Portal ensures drawer appears on top -->
+		</Drawer>
+	</div>
+</div>
+```
+
+### Overflow Hidden
+
+When parent containers have `overflow: hidden`:
+
+```svelte
+<div class="overflow-hidden h-screen">
+	<!-- Drawer would be clipped here -->
+	<Drawer bind:open portal={true}>
+		<!-- Portal escapes the overflow constraint -->
+	</Drawer>
+</div>
+```
+
+### Transform Contexts
+
+When parent elements use CSS transforms, which create new containing blocks:
+
+```svelte
+<div class="transform scale-95">
+	<!-- Fixed positioning behaves differently here -->
+	<Drawer bind:open portal={true}>
+		<!-- Portal escapes the transform context -->
+	</Drawer>
+</div>
+```
+
+### Third-Party Components
+
+When working with third-party libraries that have their own z-index management:
+
+```svelte
+<SomeLibraryModal>
+	<!-- Their modal has z-index: 1000 -->
+	<Drawer bind:open portal={true}>
+		<!-- Portal ensures proper stacking -->
+	</Drawer>
+</SomeLibraryModal>
+```
+
+## Implementation Details
+
+The portal is implemented using Svelte's mount/unmount lifecycle:
+
+```svelte /home/daytona/workspace/source/src/lib/components/Drawer.svelte:182-188
+{#if portal}
+  <DrawerPortal container={portalContainer}>
+    {@render children()}
+  </DrawerPortal>
+{:else}
+  {@render children()}
+{/if}
+```
+
+The `DrawerPortal` component handles mounting the drawer content into the specified container or `document.body` by default.
+
+## Portal vs Regular Rendering
+
+| Aspect | Regular | Portal |
+|--------|---------|--------|
+| DOM location | Where declared | `document.body` or custom |
+| Z-index issues | Possible | Avoided |
+| Overflow conflicts | Possible | Avoided |
+| Context access | Direct | Preserved via Svelte |
+| Performance | Slightly faster | Minimal overhead |
+
+## Best Practices
+
+<Tip>
+  Use portals by default in complex applications to avoid future z-index headaches
+</Tip>
+
+<Tip>
+  Create a dedicated portal container at the root of your app for consistency
+</Tip>
+
+<Note>
+  Portals maintain access to Svelte context, so all drawer features work normally
+</Note>
+
+<Warning>
+  If you use a custom portal container, ensure it exists in the DOM before the drawer renders
+</Warning>
+
+## Common Portal Container Setup
+
+Set up a global portal container in your root layout:
+
+```html
+<!-- app.html or root layout -->
+<body>
+	<div id="app">%sveltekit.body%</div>
+	<div id="portal-root"></div>
+</body>
+```
+
+Then use it in your drawers:
+
+```svelte
+<Drawer bind:open portal={true} portalContainer="#portal-root">
+	<!-- Your drawer content -->
+</Drawer>
+```
+
+## Multiple Portals
+
+You can have multiple drawers using portals simultaneously:
+
+```svelte
+<script>
+	let drawer1Open = $state(false);
+	let drawer2Open = $state(false);
+</script>
+
+<Drawer bind:open={drawer1Open} portal={true}>
+	<!-- First drawer -->
+</Drawer>
+
+<Drawer bind:open={drawer2Open} portal={true}>
+	<!-- Second drawer - both work fine -->
+</Drawer>
+```
+
+Each portal creates its own container, and z-index still works as expected since they're both in the portal root.
+
+## Debugging Portals
+
+To verify your drawer is rendered in a portal, inspect the DOM:
+
+```javascript
+// Without portal: drawer is nested in your component tree
+<div class="your-component">
+  <div class="drawer-content">...</div>
+</div>
+
+// With portal: drawer is at the root level
+<body>
+  <div id="app">...</div>
+  <div data-portal>  <!-- Portal container -->
+    <div class="drawer-content">...</div>
+  </div>
+</body>
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer">
+    Portal prop documentation
+  </Card>
+  <Card title="Styling Guide" icon="paintbrush" href="/guides/styling">
+    Learn about z-index and styling
+  </Card>
+</CardGroup>

@@ -1,0 +1,57 @@
+---
+title: 'Side Drawer'
+description: 'Drawer that slides from the left or right side'
+---
+
+# Side Drawer
+
+Drawers can slide in from any direction. This example shows a right-side drawer, perfect for navigation menus or settings panels.
+
+## What This Example Shows
+
+- Right-side drawer with `direction="right"`
+- Full-height drawer for sidebar layouts
+- Fixed width with `w-80` class
+- Auto-adaptive drag handle orientation
+
+## Code Example
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="right">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+		<DrawerHandle class="mb-4" />
+		<h2>Side Drawer</h2>
+		<button onclick={() => open = false}>Close</button>
+	</DrawerContent>
+</Drawer>
+```
+
+## Available Directions
+
+You can slide the drawer from any edge:
+
+- `direction="bottom"` - Default, slides from bottom
+- `direction="top"` - Slides from top
+- `direction="left"` - Slides from left
+- `direction="right"` - Slides from right (shown above)
+
+## Drag Handle Behavior
+
+The `DrawerHandle` component automatically adapts to the drawer direction:
+
+- **Bottom/Top drawers**: Horizontal handle (12px wide × 1.5px tall)
+- **Left/Right drawers**: Vertical handle (1.5px wide × 12px tall)
+
+## Common Use Cases
+
+- **Navigation menus**: Use `direction="left"` or `direction="right"`
+- **Settings panels**: Side drawers work well for configuration options
+- **Filter panels**: Shopping or data filtering interfaces
+- **User profiles**: Quick access to user information

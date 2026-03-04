@@ -1,0 +1,96 @@
+---
+title: 'Drawer with Snap Points'
+description: 'iOS-style drawer that snaps to multiple heights'
+---
+
+# Drawer with Snap Points
+
+Snap points allow the drawer to rest at predefined heights, creating an iOS-like sheet experience. Perfect for content that works at multiple sizes.
+
+## What This Example Shows
+
+- Multiple snap positions (25%, 50%, 90% of screen height)
+- Automatic snapping behavior on drag release
+- Programmatic snap point control
+- Callback for snap point changes
+- Active snap point tracking
+
+## Code Example
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+	let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer
+	bind:open
+	snapPoints={[0.25, 0.5, 0.9]}
+	bind:activeSnapPoint
+	onSnapPointChange={(point) => console.log('Snapped to:', point)}
+>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer with Snap Points</h2>
+		<p>Drag to see snapping behavior at 25%, 50%, and 90%</p>
+
+		<!-- Programmatically change snap point -->
+		<button onclick={() => activeSnapPoint = 0.5}>Jump to 50%</button>
+	</DrawerContent>
+</Drawer>
+```
+
+## How Snap Points Work
+
+### Value Range
+Snap point values range from `0` to `1`, representing percentages of screen height:
+
+- `0.25` = 25% of screen height
+- `0.5` = 50% of screen height  
+- `0.9` = 90% of screen height
+- `1.0` = 100% of screen height
+
+### Behavior
+
+1. **Automatic snapping**: When you release the drawer while dragging, it automatically snaps to the nearest defined point
+2. **Dismiss on over-drag**: Dragging beyond the lowest snap point dismisses the drawer
+3. **Smooth transitions**: Animated transitions between snap points
+
+## Programmatic Control
+
+### Change Active Snap Point
+
+Use `bind:activeSnapPoint` to control the drawer position:
+
+```svelte
+<script>
+	let activeSnapPoint = $state(0.25); // Start at 25%
+</script>
+
+<button onclick={() => activeSnapPoint = 0.5}>Expand to 50%</button>
+<button onclick={() => activeSnapPoint = 0.9}>Expand to 90%</button>
+```
+
+### React to Changes
+
+Use the `onSnapPointChange` callback to respond to snap changes:
+
+```svelte
+<Drawer
+	snapPoints={[0.25, 0.5, 0.9]}
+	onSnapPointChange={(point) => {
+		console.log('User dragged to:', point);
+		// Update UI, analytics, etc.
+	}}
+>
+```
+
+## Common Use Cases
+
+- **Maps applications**: Show location details at different heights
+- **Music players**: Collapsed, half, and full screen views
+- **Product details**: Preview at 30%, details at 60%, full specs at 90%
+- **Search results**: Quick peek vs. full list view

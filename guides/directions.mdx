@@ -1,0 +1,174 @@
+---
+title: 'Drawer Directions'
+description: 'Control where your drawer slides in from with support for all four directions'
+---
+
+## Overview
+
+Svelte Drawer supports four directions: `bottom`, `top`, `left`, and `right`. The drawer will slide in from the specified direction with smooth animations and gesture-driven dragging.
+
+## Available Directions
+
+### Bottom (Default)
+
+The most common direction for mobile-style bottom sheets.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<button onclick={() => open = true}>
+	Open Bottom Drawer
+</button>
+
+<Drawer bind:open direction="bottom">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Bottom Drawer</h2>
+		<p>Slides up from the bottom of the screen.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+### Top
+
+Slides down from the top of the screen.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="top">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed top-0 left-0 right-0 bg-white rounded-b-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Top Drawer</h2>
+		<p>Slides down from the top.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+### Left
+
+Slides in from the left side, perfect for navigation menus.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="left">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed left-0 top-0 bottom-0 w-80 bg-white p-4">
+		<DrawerHandle class="mb-4" />
+		<h2>Left Drawer</h2>
+		<p>Slides in from the left side.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+### Right
+
+Slides in from the right side, commonly used for side panels.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="right">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+		<DrawerHandle class="mb-4" />
+		<h2>Side Drawer</h2>
+		<p>Slides in from the right side.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+## Adaptive Drag Handle
+
+The `DrawerHandle` component automatically adapts its orientation based on the drawer direction:
+
+- **Bottom/Top drawers**: Horizontal handle (12px wide × 1.5px tall)
+- **Left/Right drawers**: Vertical handle (1.5px wide × 12px tall)
+
+```svelte /home/daytona/workspace/source/src/lib/components/DrawerHandle.svelte:12-14
+const isVertical = $derived(
+  drawer.direction === "bottom" || drawer.direction === "top"
+);
+```
+
+The handle includes the `data-drawer-drag` attribute for improved touch targeting and is fully customizable:
+
+```svelte
+<!-- Default gray handle -->
+<DrawerHandle class="mb-8" />
+
+<!-- Custom colored handle -->
+<DrawerHandle class="bg-blue-500 mb-8" />
+
+<!-- Larger handle -->
+<DrawerHandle class="w-16 h-2 mb-8" />
+```
+
+## Direction-Specific Transform Logic
+
+The drawer applies the correct transform based on direction:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:54-67
+function getTransform(): string {
+  const pos = drawer.drawerPosition.current;
+
+  switch (drawer.direction) {
+    case "bottom":
+      return `translateY(${pos}%)`;
+    case "top":
+      return `translateY(-${pos}%)`;
+    case "left":
+      return `translateX(-${pos}%)`;
+    case "right":
+      return `translateX(${pos}%)`;
+  }
+}
+```
+
+## Best Practices
+
+<Tip>
+  Use `bottom` for mobile-style sheets and quick actions
+</Tip>
+
+<Tip>
+  Use `left` or `right` for navigation menus and sidebars
+</Tip>
+
+<Tip>
+  Use `top` sparingly, as it can feel less natural on mobile devices
+</Tip>
+
+<Note>
+  Remember to adjust your CSS classes based on direction - `rounded-t-lg` for bottom drawers, `rounded-b-lg` for top drawers, etc.
+</Note>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer">
+    Full props and options for the Drawer component
+  </Card>
+  <Card title="Variants" icon="palette" href="/guides/variants">
+    Pre-styled drawer variants
+  </Card>
+</CardGroup>

@@ -1,0 +1,211 @@
+---
+title: 'Drawer'
+description: 'Main wrapper component that manages drawer state and animations'
+icon: 'window'
+---
+
+## Overview
+
+The `Drawer` component is the main wrapper that manages the drawer's state, animations, and lifecycle. It provides context to all child components and handles keyboard interactions, focus management, and optional state persistence.
+
+## Props
+
+<ParamField path="open" type="boolean" default="false">
+  Controls the open/closed state of the drawer. Use `bind:open` for two-way binding.
+  
+  ```svelte
+  let open = $state(false);
+  
+  <Drawer bind:open>
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Callback function fired when the drawer's open state changes. Useful for side effects or tracking.
+  
+  ```svelte
+  <Drawer 
+    bind:open 
+    onOpenChange={(isOpen) => {
+      console.log('Drawer is now:', isOpen ? 'open' : 'closed');
+    }}
+  >
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="direction" type="'bottom' | 'top' | 'left' | 'right'" default="'bottom'">
+  Direction from which the drawer slides in.
+  
+  ```svelte
+  <!-- Side drawer from right -->
+  <Drawer bind:open direction="right">
+    <DrawerContent class="fixed right-0 top-0 bottom-0 w-80">
+      <!-- content -->
+    </DrawerContent>
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="closeOnEscape" type="boolean" default="true">
+  Whether pressing the Escape key closes the drawer.
+  
+  ```svelte
+  <!-- Prevent closing with Escape -->
+  <Drawer bind:open closeOnEscape={false}>
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="snapPoints" type="number[]">
+  Array of snap positions between 0 and 1 (e.g., `[0.25, 0.5, 0.9]` for 25%, 50%, and 90% of screen height). Creates an iOS-like sheet experience.
+  
+  ```svelte
+  <Drawer 
+    bind:open 
+    snapPoints={[0.25, 0.5, 0.9]}
+    bind:activeSnapPoint
+  >
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="activeSnapPoint" type="number">
+  Current active snap point value. Use `bind:activeSnapPoint` to programmatically control the drawer position.
+  
+  ```svelte
+  let activeSnapPoint = $state(undefined);
+  
+  <Drawer 
+    bind:open 
+    snapPoints={[0.25, 0.5, 0.9]}
+    bind:activeSnapPoint
+  >
+    <DrawerContent>
+      <button onclick={() => activeSnapPoint = 0.5}>
+        Jump to 50%
+      </button>
+    </DrawerContent>
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="onSnapPointChange" type="(snapPoint: number) => void">
+  Callback fired when the active snap point changes.
+  
+  ```svelte
+  <Drawer 
+    snapPoints={[0.25, 0.5, 0.9]}
+    onSnapPointChange={(point) => console.log('Snapped to:', point)}
+  >
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="portal" type="boolean" default="false">
+  Render the drawer in a portal at the end of the document body to avoid z-index conflicts.
+  
+  ```svelte
+  <Drawer bind:open portal={true}>
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="portalContainer" type="HTMLElement | string">
+  Custom portal container element or CSS selector. Only used when `portal={true}`.
+  
+  ```svelte
+  <Drawer bind:open portal={true} portalContainer="#custom-portal">
+    <!-- drawer content -->
+  </Drawer>
+  
+  <div id="custom-portal"></div>
+  ```
+</ParamField>
+
+<ParamField path="persistState" type="boolean" default="false">
+  Automatically save and restore drawer state (open/closed) across page reloads using localStorage.
+  
+  ```svelte
+  <Drawer 
+    bind:open 
+    persistState={true}
+    persistKey="main-drawer"
+  >
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="persistKey" type="string" default="'default'">
+  Unique identifier for this drawer when using `persistState`. Required when using multiple persistent drawers.
+  
+  ```svelte
+  <Drawer persistState={true} persistKey="settings-drawer">
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+<ParamField path="persistSnapPoint" type="boolean" default="false">
+  Whether to persist the snap point position along with the drawer state. Only used when `persistState={true}` and `snapPoints` are defined.
+  
+  ```svelte
+  <Drawer 
+    snapPoints={[0.25, 0.5, 0.9]}
+    persistState={true}
+    persistSnapPoint={true}
+  >
+    <!-- drawer content -->
+  </Drawer>
+  ```
+</ParamField>
+
+## Usage Example
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<button onclick={() => open = true}>
+  Open Drawer
+</button>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <DrawerHandle class="mb-8" />
+    <h2>Drawer Content</h2>
+    <p>This is a drawer component.</p>
+    <button onclick={() => open = false}>Close</button>
+  </DrawerContent>
+</Drawer>
+```
+
+## Features
+
+- **State Management**: Controls drawer visibility and animations
+- **Keyboard Support**: Escape key to close (configurable)
+- **Focus Management**: Auto-focus and focus restoration
+- **Snap Points**: iOS-like multi-height drawers
+- **Portal Rendering**: Escape z-index conflicts
+- **State Persistence**: Save drawer state across reloads
+- **Flexible Directions**: Bottom, top, left, or right drawers
+
+## Related Components
+
+- [DrawerContent](/api/drawer-content) - Content container with drag handling
+- [DrawerOverlay](/api/drawer-overlay) - Background overlay
+- [DrawerHandle](/api/drawer-handle) - Visual drag indicator
+- [DrawerVariants](/api/drawer-variants) - Pre-styled drawer variants
+- [DrawerPortal](/api/drawer-portal) - Portal rendering component

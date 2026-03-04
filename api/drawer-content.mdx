@@ -1,0 +1,179 @@
+---
+title: 'DrawerContent'
+description: 'Content container for the drawer with drag handling and focus management'
+icon: 'window-maximize'
+---
+
+## Overview
+
+The `DrawerContent` component is the main content container for the drawer. It handles drag gestures, snap point calculations, and focus management. This component must be used within a `Drawer` component.
+
+## Props
+
+<ParamField path="class" type="string">
+  CSS classes for styling the drawer content. Typically includes positioning (`fixed`, `bottom-0`), sizing, background color, and border radius.
+  
+  ```svelte
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <!-- content -->
+  </DrawerContent>
+  ```
+</ParamField>
+
+<ParamField path="trapFocus" type="boolean" default="true">
+  Whether to trap keyboard focus inside the drawer. When `true`, Tab navigation is restricted to focusable elements within the drawer.
+  
+  ```svelte
+  <!-- Disable focus trap -->
+  <DrawerContent trapFocus={false} class="...">
+    <h2>Tab navigation not restricted</h2>
+  </DrawerContent>
+  ```
+</ParamField>
+
+## Usage Examples
+
+### Basic Bottom Drawer
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Bottom Drawer</h2>
+    <p>Drag down to close</p>
+  </DrawerContent>
+</Drawer>
+```
+
+### Side Drawer (Right)
+
+```svelte
+<Drawer bind:open direction="right">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+    <h2>Side Drawer</h2>
+    <p>Drag right to close</p>
+  </DrawerContent>
+</Drawer>
+```
+
+### With Custom Focus Behavior
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent 
+    trapFocus={false} 
+    class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4"
+  >
+    <h2>No Focus Trap</h2>
+    <p>Tab key can navigate outside this drawer</p>
+  </DrawerContent>
+</Drawer>
+```
+
+### Scrollable Content
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col max-h-[90vh]">
+  <div class="p-4 border-b">
+    <h2>Fixed Header</h2>
+  </div>
+  
+  <div class="flex-1 overflow-y-auto p-4">
+    <p>Long scrollable content...</p>
+    <!-- More content -->
+  </div>
+  
+  <div class="p-4 border-t">
+    <button>Fixed Footer Button</button>
+  </div>
+</DrawerContent>
+```
+
+## Drag Behavior
+
+The `DrawerContent` component automatically handles:
+
+- **Mouse & Touch Events**: Supports both desktop and mobile interactions
+- **Direction-Aware Dragging**: Adapts to the drawer's `direction` prop
+- **Snap Points**: Automatically snaps to predefined positions when configured
+- **Dismissal Threshold**: Closes drawer when dragged beyond 30% from the edge
+- **Smooth Animations**: Eased transitions between positions
+
+### Drag Handle Areas
+
+By default, dragging works on the entire drawer content **except** on interactive elements:
+
+- `<button>`, `<a>`, `<input>`, `<textarea>`, `<select>`
+
+To make an interactive element draggable, add the `data-drawer-drag` attribute:
+
+```svelte
+<button data-drawer-drag>I can be dragged!</button>
+```
+
+## Focus Management
+
+When `trapFocus={true}` (default):
+
+1. **Auto-focus**: First focusable element is focused when drawer opens
+2. **Focus Trap**: Tab/Shift+Tab cycles through focusable elements inside drawer
+3. **Focus Restoration**: Previously focused element is restored when drawer closes
+
+When `trapFocus={false}`:
+
+- Tab navigation works normally across the entire page
+- Focus is not automatically moved when drawer opens
+
+## Accessibility
+
+The component automatically includes:
+
+- `role="dialog"` - Identifies the drawer as a dialog
+- `aria-modal="true"` - Indicates the drawer is modal
+- `tabindex="-1"` - Allows programmatic focus
+
+## Styling
+
+The component applies:
+
+- `z-index: 50` - Ensures drawer appears above overlay (z-index: 40)
+- `touch-action: none` - Prevents browser scroll during drag
+- Dynamic `transform` - Handles positioning based on direction and drag state
+
+### Common Class Patterns
+
+**Bottom Drawer:**
+```svelte
+class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4"
+```
+
+**Top Drawer:**
+```svelte
+class="fixed top-0 left-0 right-0 bg-white rounded-b-lg p-4"
+```
+
+**Left Drawer:**
+```svelte
+class="fixed left-0 top-0 bottom-0 w-80 bg-white p-4"
+```
+
+**Right Drawer:**
+```svelte
+class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4"
+```
+
+## Related Components
+
+- [Drawer](/api/drawer) - Main wrapper component
+- [DrawerHandle](/api/drawer-handle) - Visual drag indicator
+- [DrawerVariants](/api/drawer-variants) - Pre-styled variants
+- [DrawerHeader](/api/drawer-header) - Optional header component
+- [DrawerFooter](/api/drawer-footer) - Optional footer component

@@ -1,0 +1,307 @@
+---
+title: 'DrawerVariants'
+description: 'Pre-styled drawer content with built-in variants'
+icon: 'palette'
+---
+
+## Overview
+
+The `DrawerVariants` component provides pre-styled drawer layouts for common use cases. It wraps `DrawerContent` with preset styles, saving you from writing boilerplate positioning and styling classes.
+
+## Props
+
+<ParamField path="variant" type="'default' | 'sheet' | 'dialog' | 'minimal' | 'sidebar'" default="'default'">
+  Preset style variant to apply. Each variant has specific positioning, sizing, and styling.
+  
+  ```svelte
+  <DrawerVariants variant="sheet">
+    <!-- iOS-style bottom sheet -->
+  </DrawerVariants>
+  ```
+</ParamField>
+
+<ParamField path="class" type="string">
+  Additional CSS classes to customize the variant. These classes are merged with the variant's default styles.
+  
+  ```svelte
+  <DrawerVariants variant="sheet" class="max-h-[70vh]">
+    <!-- Custom height limit -->
+  </DrawerVariants>
+  ```
+</ParamField>
+
+<ParamField path="trapFocus" type="boolean" default="true">
+  Whether to trap keyboard focus inside the drawer. Passed through to the underlying `DrawerContent`.
+  
+  ```svelte
+  <DrawerVariants variant="dialog" trapFocus={false}>
+    <!-- No focus trap -->
+  </DrawerVariants>
+  ```
+</ParamField>
+
+## Available Variants
+
+### `default`
+
+Standard bottom drawer with gray background.
+
+**Styling:**
+- Background: `bg-gray-100`
+- Position: `fixed bottom-0 left-0 right-0`
+- Border radius: `rounded-t-[10px]`
+- Top margin: `mt-24`
+- Height: `h-fit` (auto-sized)
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="default">
+    <div class="p-6">
+      <h2>Default Drawer</h2>
+      <p>Gray background, bottom-positioned</p>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### `sheet`
+
+iOS-style bottom sheet with white background and large height.
+
+**Styling:**
+- Background: `bg-white`
+- Position: `fixed bottom-0 left-0 right-0`
+- Border radius: `rounded-t-3xl` (very rounded)
+- Height: `h-[85vh]` (85% of viewport)
+- Shadow: `shadow-2xl`
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="sheet">
+    <div class="p-6">
+      <DrawerHandle class="mb-6" />
+      <h2>iOS-style Sheet</h2>
+      <p>Clean and modern bottom sheet design</p>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### `dialog`
+
+Center-positioned modal dialog.
+
+**Styling:**
+- Background: `bg-white`
+- Position: `fixed inset-0 m-auto`
+- Border radius: `rounded-lg`
+- Max width: `max-w-lg`
+- Max height: `max-h-[90vh]`
+- Height: `h-fit` (auto-sized)
+- Shadow: `shadow-xl`
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="dialog">
+    <div class="p-6">
+      <h2>Dialog Style</h2>
+      <p>Center-positioned modal dialog</p>
+      <div class="flex gap-2 mt-4">
+        <button>Cancel</button>
+        <button>Confirm</button>
+      </div>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### `minimal`
+
+Simple bottom drawer without extra styling.
+
+**Styling:**
+- Background: `bg-white`
+- Position: `fixed bottom-0 left-0 right-0`
+- Height: `h-fit` (auto-sized)
+- No border radius, no shadows
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="minimal">
+    <div class="p-4">
+      <h2>Minimal Drawer</h2>
+      <p>No extra styling, clean and simple</p>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### `sidebar`
+
+Side navigation drawer with full height.
+
+**Styling:**
+- Background: `bg-white`
+- Position: `fixed top-0 bottom-0`
+- Width: `w-full max-w-sm` (full width, max 384px)
+- Height: `h-full`
+- Shadow: `shadow-2xl`
+
+**Note:** Use with `direction="left"` or `direction="right"` on the `Drawer` component.
+
+```svelte
+<Drawer bind:open direction="right">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="sidebar">
+    <div class="p-6">
+      <DrawerHandle class="mb-4" />
+      <nav>
+        <h2>Navigation</h2>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+## Usage Examples
+
+### Sheet Variant with Snap Points
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+  let activeSnapPoint = $state(undefined);
+</script>
+
+<Drawer 
+  bind:open 
+  snapPoints={[0.25, 0.5, 0.9]}
+  bind:activeSnapPoint
+>
+  <DrawerOverlay blur class="fixed inset-0 bg-black/20" />
+  <DrawerVariants variant="sheet">
+    <div class="p-6">
+      <DrawerHandle class="mb-6" />
+      <h2>Snap Points Sheet</h2>
+      <p>Drag to snap at 25%, 50%, or 90%</p>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### Dialog Variant for Confirmations
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay blur="lg" class="fixed inset-0 bg-black/30" />
+  <DrawerVariants variant="dialog">
+    <div class="p-6">
+      <h2 class="text-xl font-semibold mb-2">Delete Item?</h2>
+      <p class="text-gray-600 mb-6">This action cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button 
+          onclick={() => open = false}
+          class="px-4 py-2 bg-gray-200 rounded"
+        >
+          Cancel
+        </button>
+        <button 
+          class="px-4 py-2 bg-red-600 text-white rounded"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### Sidebar Variant for Navigation
+
+```svelte
+<Drawer bind:open direction="left">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerVariants variant="sidebar">
+    <div class="flex flex-col h-full p-6">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-xl font-bold">Menu</h2>
+        <button onclick={() => open = false}>✕</button>
+      </div>
+      
+      <nav class="flex-1">
+        <ul class="space-y-4">
+          <li><a href="/" class="block py-2">Home</a></li>
+          <li><a href="/about" class="block py-2">About</a></li>
+          <li><a href="/contact" class="block py-2">Contact</a></li>
+        </ul>
+      </nav>
+      
+      <div class="border-t pt-4">
+        <p class="text-sm text-gray-600">© 2024 Your App</p>
+      </div>
+    </div>
+  </DrawerVariants>
+</Drawer>
+```
+
+### Customizing Variants
+
+```svelte
+<!-- Override height of sheet variant -->
+<DrawerVariants variant="sheet" class="h-[60vh]">
+  <div class="p-6">Shorter sheet</div>
+</DrawerVariants>
+
+<!-- Override max-width of dialog variant -->
+<DrawerVariants variant="dialog" class="max-w-2xl">
+  <div class="p-6">Wider dialog</div>
+</DrawerVariants>
+
+<!-- Override sidebar width -->
+<DrawerVariants variant="sidebar" class="max-w-md">
+  <div class="p-6">Wider sidebar</div>
+</DrawerVariants>
+
+<!-- Add custom background -->
+<DrawerVariants variant="default" class="bg-gradient-to-b from-blue-50 to-white">
+  <div class="p-6">Gradient background</div>
+</DrawerVariants>
+```
+
+## Variant Comparison
+
+| Variant | Position | Size | Use Case |
+|---------|----------|------|----------|
+| `default` | Bottom | Auto | General purpose, subtle |
+| `sheet` | Bottom | 85vh | iOS-style, full content |
+| `dialog` | Center | Auto, max 90vh | Confirmations, forms |
+| `minimal` | Bottom | Auto | Clean, unstyled |
+| `sidebar` | Left/Right | Full height | Navigation menus |
+
+## Relation to DrawerContent
+
+`DrawerVariants` internally uses `DrawerContent` and passes through:
+
+- `trapFocus` prop
+- All other props (`...restProps`)
+- Children content
+
+It's essentially a convenience wrapper that adds preset `class` values.
+
+## Related Components
+
+- [DrawerContent](/api/drawer-content) - Underlying content container
+- [Drawer](/api/drawer) - Main wrapper component
+- [DrawerHandle](/api/drawer-handle) - Visual drag indicator
+- [DrawerHeader](/api/drawer-header) - Optional header component
+- [DrawerFooter](/api/drawer-footer) - Optional footer component

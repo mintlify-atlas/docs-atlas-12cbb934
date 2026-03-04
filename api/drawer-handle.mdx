@@ -1,0 +1,208 @@
+---
+title: 'DrawerHandle'
+description: 'Visual drag indicator that automatically adapts to drawer direction'
+icon: 'grip-lines'
+---
+
+## Overview
+
+The `DrawerHandle` component renders a visual drag indicator (handle bar) that helps users understand the drawer can be dragged. It automatically adapts its orientation based on the drawer's direction.
+
+## Props
+
+<ParamField path="class" type="string">
+  CSS classes for customizing the handle's appearance. Can override default colors, size, or spacing.
+  
+  ```svelte
+  <!-- Custom color -->
+  <DrawerHandle class="bg-blue-500 mb-8" />
+  
+  <!-- Custom size -->
+  <DrawerHandle class="w-16 h-2 mb-8" />
+  ```
+</ParamField>
+
+## Auto-Adaptive Orientation
+
+The handle automatically adjusts its orientation based on the drawer's `direction`:
+
+**Bottom/Top Drawers** (horizontal handle):
+- Width: `12px` (w-12 / 3rem)
+- Height: `1.5px` (h-1.5 / 0.375rem)
+- Centered horizontally with `mx-auto`
+
+**Left/Right Drawers** (vertical handle):
+- Width: `1.5px` (w-1.5 / 0.375rem)
+- Height: `12px` (h-12 / 3rem)
+- Centered vertically with `my-auto`
+
+## Usage Examples
+
+### Bottom Drawer
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <DrawerHandle class="mb-8" />
+    <h2>Drawer with Handle</h2>
+    <p>The handle automatically adapts to drawer direction.</p>
+  </DrawerContent>
+</Drawer>
+```
+
+### Side Drawer
+
+```svelte
+<Drawer bind:open direction="right">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+    <DrawerHandle class="mb-4" />
+    <h2>Side Drawer</h2>
+  </DrawerContent>
+</Drawer>
+```
+
+### Custom Styling
+
+```svelte
+<!-- Default gray handle -->
+<DrawerHandle class="mb-8" />
+
+<!-- Custom color -->
+<DrawerHandle class="bg-blue-500 mb-8" />
+
+<!-- Larger size -->
+<DrawerHandle class="w-16 h-2 mb-8" />
+
+<!-- Custom styling with opacity -->
+<DrawerHandle class="bg-gray-400 opacity-50 mb-6" />
+
+<!-- Themed handle -->
+<DrawerHandle class="bg-gradient-to-r from-blue-500 to-purple-500 mb-8" />
+```
+
+### All Drawer Directions
+
+```svelte
+<!-- Bottom drawer - horizontal handle -->
+<Drawer bind:open direction="bottom">
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <DrawerHandle class="mb-4" /> <!-- Horizontal -->
+  </DrawerContent>
+</Drawer>
+
+<!-- Top drawer - horizontal handle -->
+<Drawer bind:open direction="top">
+  <DrawerContent class="fixed top-0 left-0 right-0 bg-white rounded-b-lg p-4">
+    <DrawerHandle class="mb-4" /> <!-- Horizontal -->
+  </DrawerContent>
+</Drawer>
+
+<!-- Left drawer - vertical handle -->
+<Drawer bind:open direction="left">
+  <DrawerContent class="fixed left-0 top-0 bottom-0 w-80 bg-white p-4">
+    <DrawerHandle class="ml-4" /> <!-- Vertical -->
+  </DrawerContent>
+</Drawer>
+
+<!-- Right drawer - vertical handle -->
+<Drawer bind:open direction="right">
+  <DrawerContent class="fixed right-0 top-0 bottom-0 w-80 bg-white p-4">
+    <DrawerHandle class="mr-4" /> <!-- Vertical -->
+  </DrawerContent>
+</Drawer>
+```
+
+## Default Styling
+
+The handle comes with sensible defaults:
+
+- `rounded-full` - Fully rounded corners
+- `bg-gray-300` - Gray background color
+- `flex-shrink-0` - Prevents shrinking in flex containers
+- `cursor-grab` - Indicates draggable area
+- `active:cursor-grabbing` - Shows grabbing state when clicked
+
+## Drag Functionality
+
+The handle includes the `data-drawer-drag` attribute, which:
+
+1. **Marks it as a drag zone**: Always draggable, even if placed within interactive elements
+2. **Improves touch targeting**: Provides a clear area for mobile users to grab
+3. **Visual affordance**: Indicates to users that the drawer can be dragged
+
+## Accessibility
+
+The component includes:
+
+- `aria-hidden="true"` - Hidden from screen readers (decorative element)
+- `role="presentation"` - Indicates the element is presentational
+
+The handle is purely visual. Drawer functionality works without it, using drag gestures on the entire `DrawerContent`.
+
+## When to Use
+
+Use `DrawerHandle` when:
+
+- You want a clear visual indicator that the drawer is draggable
+- Following mobile design patterns (iOS-style sheets)
+- Creating touch-friendly interfaces
+- You have interactive content and want a dedicated drag area
+
+You can omit it when:
+
+- Creating minimal designs
+- Building desktop-only experiences
+- Using pre-styled `DrawerVariants` (some variants exclude handles)
+
+## Common Patterns
+
+### With Header
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+  <DrawerHandle class="mt-4 mb-2" />
+  <div class="px-4 pb-4">
+    <h2 class="text-lg font-semibold">Title</h2>
+    <p>Content...</p>
+  </div>
+</DrawerContent>
+```
+
+### With DrawerHeader Component
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+  <div class="pt-4 px-4">
+    <DrawerHandle class="mb-4" />
+  </div>
+  <DrawerHeader title="Drawer Title" description="Description" />
+  <div class="p-4">
+    <p>Content...</p>
+  </div>
+</DrawerContent>
+```
+
+### In Variants
+
+```svelte
+<DrawerVariants variant="sheet">
+  <div class="p-6">
+    <DrawerHandle class="mb-6" />
+    <h2>iOS-style Sheet</h2>
+  </div>
+</DrawerVariants>
+```
+
+## Related Components
+
+- [DrawerContent](/api/drawer-content) - Content container with drag handling
+- [Drawer](/api/drawer) - Main wrapper component
+- [DrawerVariants](/api/drawer-variants) - Pre-styled drawer variants

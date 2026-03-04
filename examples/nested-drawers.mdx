@@ -1,0 +1,177 @@
+---
+title: 'Nested Drawers'
+description: 'Multiple drawers working together'
+---
+
+# Nested Drawers
+
+Svelte Drawer supports nested drawers, allowing you to open one drawer from within another. This is useful for multi-step workflows, detail views, and progressive disclosure patterns.
+
+## What This Example Shows
+
+- Opening a drawer from within another drawer
+- Independent state management for each drawer
+- Portal rendering to avoid z-index conflicts
+- Proper focus management with nested content
+
+## Code Example
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let firstDrawerOpen = $state(false);
+	let secondDrawerOpen = $state(false);
+</script>
+
+<!-- First Drawer (Main) -->
+<button onclick={() => firstDrawerOpen = true}>
+	Open Main Drawer
+</button>
+
+<Drawer bind:open={firstDrawerOpen}>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Main Drawer</h2>
+		<p>This is the first drawer.</p>
+		
+		<!-- Button to open second drawer -->
+		<button 
+			onclick={() => secondDrawerOpen = true}
+			class="px-4 py-2 bg-blue-500 text-white rounded mt-4"
+		>
+			Open Details
+		</button>
+		
+		<button onclick={() => firstDrawerOpen = false}>Close</button>
+	</DrawerContent>
+</Drawer>
+
+<!-- Second Drawer (Nested) -->
+<Drawer bind:open={secondDrawerOpen} portal={true}>
+	<DrawerOverlay class="fixed inset-0 bg-black/60" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Details Drawer</h2>
+		<p>This drawer opened from within the first drawer.</p>
+		<button onclick={() => secondDrawerOpen = false}>Close Details</button>
+	</DrawerContent>
+</Drawer>
+```
+
+## Best Practices
+
+### 1. Use Portal Rendering
+
+Always enable portal for nested drawers to avoid z-index issues:
+
+```svelte
+<Drawer bind:open={secondDrawerOpen} portal={true}>
+	<!-- Content -->
+</Drawer>
+```
+
+### 2. Increase Overlay Opacity
+
+Make the nested drawer's overlay darker to indicate hierarchy:
+
+```svelte
+<!-- First drawer -->
+<DrawerOverlay class="fixed inset-0 bg-black/40" />
+
+<!-- Second drawer (darker) -->
+<DrawerOverlay class="fixed inset-0 bg-black/60" />
+```
+
+### 3. Different Directions
+
+Consider using different directions for visual hierarchy:
+
+```svelte
+<!-- Main drawer from bottom -->
+<Drawer bind:open={firstDrawerOpen} direction="bottom">
+	<!-- ... -->
+</Drawer>
+
+<!-- Detail drawer from right -->
+<Drawer bind:open={secondDrawerOpen} direction="right" portal={true}>
+	<!-- ... -->
+</Drawer>
+```
+
+## Advanced Example: Side + Bottom Drawers
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerVariants } from '@abhivarde/svelte-drawer';
+
+	let menuOpen = $state(false);
+	let detailsOpen = $state(false);
+</script>
+
+<!-- Navigation drawer (left side) -->
+<Drawer bind:open={menuOpen} direction="left">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="sidebar">
+		<div class="p-6">
+			<h2>Navigation</h2>
+			<button onclick={() => detailsOpen = true}>View Details</button>
+		</div>
+	</DrawerVariants>
+</Drawer>
+
+<!-- Details drawer (bottom) -->
+<Drawer bind:open={detailsOpen} portal={true}>
+	<DrawerOverlay class="fixed inset-0 bg-black/60" />
+	<DrawerVariants variant="sheet">
+		<div class="p-6">
+			<h2>Item Details</h2>
+			<p>Details opened from the navigation drawer.</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+## Common Use Cases
+
+### Multi-Step Forms
+1. Main drawer shows form overview
+2. Nested drawer for detailed field configuration
+3. Another nested drawer for help/documentation
+
+### E-Commerce
+1. Product list in main drawer
+2. Product details in nested drawer
+3. Size guide in third drawer
+
+### Navigation + Details
+1. Sidebar for navigation menu
+2. Bottom sheet for selected item details
+3. Full-screen drawer for editing
+
+## Focus Management
+
+Focus is automatically managed between nested drawers:
+
+1. Opening a nested drawer moves focus to it
+2. Closing the nested drawer returns focus to the parent
+3. Escape key closes the topmost drawer first
+4. Each drawer maintains its own focus trap
+
+## Performance Tips
+
+1. **Use portal**: Always enable for nested drawers
+2. **Lazy load**: Don't render nested drawer content until needed
+3. **Limit nesting**: Avoid more than 2-3 levels deep
+4. **Close on navigation**: Close parent drawers when opening nested ones if appropriate
+
+```svelte
+<!-- Close parent when opening nested -->
+<button onclick={() => {
+	firstDrawerOpen = false;
+	secondDrawerOpen = true;
+}}>
+	Go to Details
+</button>
+```

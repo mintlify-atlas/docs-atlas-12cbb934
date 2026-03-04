@@ -1,0 +1,309 @@
+---
+title: 'DrawerHeader'
+description: 'Optional pre-styled header component for drawers'
+icon: 'heading'
+---
+
+## Overview
+
+The `DrawerHeader` component provides a pre-styled header for drawers with optional title, description, and close button. It's entirely optional—you can build custom headers using regular HTML instead.
+
+## Props
+
+<ParamField path="title" type="string">
+  Header title text. Rendered as an `<h2>` with semibold styling.
+  
+  ```svelte
+  <DrawerHeader title="Drawer Title" />
+  ```
+</ParamField>
+
+<ParamField path="description" type="string">
+  Optional description text displayed below the title. Rendered as a `<p>` with gray color.
+  
+  ```svelte
+  <DrawerHeader 
+    title="Settings" 
+    description="Manage your account preferences" 
+  />
+  ```
+</ParamField>
+
+<ParamField path="showCloseButton" type="boolean" default="true">
+  Whether to display a close button (X icon) in the top-right corner.
+  
+  ```svelte
+  <!-- Hide close button -->
+  <DrawerHeader title="Title" showCloseButton={false} />
+  ```
+</ParamField>
+
+<ParamField path="onClose" type="() => void">
+  Custom close handler. If not provided, uses the drawer's default `closeDrawer()` function from context.
+  
+  ```svelte
+  <DrawerHeader 
+    title="Title" 
+    onClose={() => {
+      console.log('Custom close logic');
+      // Additional cleanup
+      open = false;
+    }} 
+  />
+  ```
+</ParamField>
+
+<ParamField path="class" type="string">
+  Additional CSS classes to customize the header styling.
+  
+  ```svelte
+  <DrawerHeader 
+    title="Custom Header" 
+    class="bg-blue-50 border-blue-200" 
+  />
+  ```
+</ParamField>
+
+## Usage Examples
+
+### Basic Header
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent, DrawerHeader } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+    <DrawerHeader 
+      title="Drawer Title" 
+      description="Optional description text"
+    />
+    <div class="p-4">
+      <p>Drawer content here</p>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Header with Close Button
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+    <DrawerHeader 
+      title="Settings" 
+      description="Manage your preferences"
+      showCloseButton={true}
+    />
+    <div class="p-4">
+      <p>Settings content...</p>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Custom Close Handler
+
+```svelte
+<script>
+  let open = $state(false);
+  
+  function handleClose() {
+    console.log('Saving before close...');
+    // Save data, analytics, etc.
+    open = false;
+  }
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+    <DrawerHeader 
+      title="Form" 
+      description="Fill out the form below"
+      onClose={handleClose}
+    />
+    <div class="p-4">
+      <form><!-- form fields --></form>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Custom Header Content
+
+You can pass custom content as children instead of using `title` and `description` props:
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+    <DrawerHeader>
+      <div class="flex items-center gap-3">
+        <img src="/icon.png" alt="Icon" class="w-8 h-8" />
+        <div>
+          <h2 class="font-semibold">Custom Header</h2>
+          <p class="text-sm text-gray-600">Your custom content</p>
+        </div>
+      </div>
+    </DrawerHeader>
+    <div class="p-4">
+      <p>Drawer content</p>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Styled Header
+
+```svelte
+<!-- Light blue header -->
+<DrawerHeader 
+  title="Information" 
+  description="Read the details below"
+  class="bg-blue-50 border-blue-200"
+/>
+
+<!-- Dark header -->
+<DrawerHeader 
+  title="Settings" 
+  class="bg-gray-800 border-gray-700 text-white"
+/>
+
+<!-- No border -->
+<DrawerHeader 
+  title="Simple" 
+  class="border-0"
+/>
+```
+
+### With DrawerHandle
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+    <div class="pt-4 px-4">
+      <DrawerHandle class="mb-4" />
+    </div>
+    <DrawerHeader 
+      title="Drawer with Handle" 
+      description="Drag the handle to resize"
+      showCloseButton={false}
+    />
+    <div class="p-4">
+      <p>Content...</p>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Complete Layout Example
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay blur class="fixed inset-0 bg-black/20" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col max-h-[90vh]">
+    <!-- Header -->
+    <DrawerHeader 
+      title="User Profile" 
+      description="View and edit your profile information"
+    />
+    
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto p-4">
+      <p>Profile information...</p>
+      <p>More content...</p>
+    </div>
+    
+    <!-- Footer -->
+    <div class="border-t p-4 flex justify-end gap-2">
+      <button onclick={() => open = false} class="px-4 py-2 bg-gray-200 rounded">
+        Cancel
+      </button>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded">
+        Save Changes
+      </button>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+## Default Styling
+
+The header includes:
+
+- `border-b border-gray-200` - Bottom border separator
+- `p-4` - Padding on all sides
+- Title: `text-lg font-semibold text-gray-900`
+- Description: `text-sm text-gray-600 mt-1`
+- Close button: Rounded with hover effect
+
+## Close Button Icon
+
+The close button uses an SVG X icon:
+
+- Size: `w-5 h-5`
+- Color: `text-gray-500`
+- Interactive area: `p-2` with `rounded-md`
+- Hover: `hover:bg-gray-100`
+- Accessible: `aria-label="Close drawer"`
+
+## Accessibility
+
+The component includes:
+
+- Semantic `<h2>` for title (proper heading hierarchy)
+- `<p>` for description
+- `aria-label="Close drawer"` on close button
+- Keyboard accessible close button
+- Works with screen readers
+
+## When to Use
+
+Use `DrawerHeader` when:
+
+- You want a quick, consistent header without custom styling
+- You need a title and/or description
+- You want a built-in close button
+
+Build a custom header when:
+
+- You need complex layouts (tabs, icons, buttons)
+- You want full control over styling
+- You're using a design system with custom header patterns
+
+## Alternative: Custom Header
+
+You can build headers without this component:
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+  <!-- Custom header -->
+  <div class="border-b p-4 flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold">My Custom Header</h2>
+      <p class="text-sm text-gray-500">With custom styling</p>
+    </div>
+    <button onclick={() => open = false} class="text-gray-400 hover:text-gray-600">
+      ✕
+    </button>
+  </div>
+  
+  <div class="p-4">
+    <p>Content...</p>
+  </div>
+</DrawerContent>
+```
+
+## Related Components
+
+- [DrawerFooter](/api/drawer-footer) - Optional footer component
+- [DrawerContent](/api/drawer-content) - Content container
+- [DrawerHandle](/api/drawer-handle) - Visual drag indicator
+- [Drawer](/api/drawer) - Main wrapper component

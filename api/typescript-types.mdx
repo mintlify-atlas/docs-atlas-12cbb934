@@ -1,0 +1,336 @@
+---
+title: TypeScript types
+description: TypeScript type definitions for Svelte Drawer components and props
+---
+
+Svelte Drawer exports TypeScript types for all component props, enabling type-safe usage and better IDE autocomplete support.
+
+## Importing types
+
+```typescript
+import type {
+  DrawerProps,
+  DrawerContentProps,
+  DrawerOverlayProps,
+  DrawerHandleProps,
+  DrawerVariant,
+  DrawerVariantsProps,
+  DrawerPortalProps,
+  DrawerHeaderProps,
+  DrawerFooterProps,
+} from 'svelte-drawer';
+```
+
+## Type definitions
+
+### DrawerProps
+
+Props for the main `Drawer` component.
+
+```typescript
+interface DrawerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  direction?: "bottom" | "top" | "left" | "right";
+  closeOnEscape?: boolean;
+  snapPoints?: number[];
+  activeSnapPoint?: number;
+  onSnapPointChange?: (snapPoint: number) => void;
+  portal?: boolean;
+  portalContainer?: HTMLElement | string;
+  persistState?: boolean;
+  persistKey?: string;
+  persistSnapPoint?: boolean;
+}
+```
+
+**Use when:** Defining props for the root Drawer component or creating wrapper components.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer } from 'svelte-drawer';
+  import type { DrawerProps } from 'svelte-drawer';
+  
+  let props: Partial<DrawerProps> = {
+    direction: 'bottom',
+    snapPoints: [0.5, 0.75, 1],
+    closeOnEscape: true,
+  };
+</script>
+
+<Drawer {...props}>
+  <!-- content -->
+</Drawer>
+```
+
+### DrawerContentProps
+
+Props for the `DrawerContent` component.
+
+```typescript
+interface DrawerContentProps {
+  class?: string;
+  trapFocus?: boolean;
+}
+```
+
+**Use when:** Customizing the drawer content container with focus trapping and styling.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerContent } from 'svelte-drawer';
+  
+  const contentProps = {
+    class: 'bg-white rounded-t-xl',
+    trapFocus: true,
+  };
+</script>
+
+<Drawer open>
+  <DrawerContent {...contentProps}>
+    <!-- content -->
+  </DrawerContent>
+</Drawer>
+```
+
+### DrawerOverlayProps
+
+Props for the `DrawerOverlay` component.
+
+```typescript
+interface DrawerOverlayProps {
+  class?: string;
+  blur?: boolean | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+}
+```
+
+**Use when:** Customizing the backdrop overlay appearance and blur effects.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerOverlay } from 'svelte-drawer';
+  
+  const overlayProps = {
+    class: 'bg-black/50',
+    blur: 'md',
+  };
+</script>
+
+<Drawer open>
+  <DrawerOverlay {...overlayProps} />
+  <!-- content -->
+</Drawer>
+```
+
+### DrawerHandleProps
+
+Props for the `DrawerHandle` component.
+
+```typescript
+interface DrawerHandleProps {
+  class?: string;
+}
+```
+
+**Use when:** Adding a drag handle indicator to your drawer.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerHandle } from 'svelte-drawer';
+</script>
+
+<Drawer open>
+  <DrawerHandle class="my-4" />
+  <!-- content -->
+</Drawer>
+```
+
+### DrawerVariant
+
+Union type for predefined drawer style variants.
+
+```typescript
+type DrawerVariant = "default" | "sheet" | "dialog" | "minimal" | "sidebar";
+```
+
+**Use when:** Specifying a variant for the `DrawerVariants` component or creating type-safe variant selection.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import type { DrawerVariant } from 'svelte-drawer';
+  
+  let selectedVariant: DrawerVariant = 'sheet';
+  
+  function changeVariant(variant: DrawerVariant) {
+    selectedVariant = variant;
+  }
+</script>
+```
+
+### DrawerVariantsProps
+
+Props for the `DrawerVariants` component.
+
+```typescript
+interface DrawerVariantsProps {
+  variant?: DrawerVariant;
+  class?: string;
+  trapFocus?: boolean;
+}
+```
+
+**Use when:** Using the variants component with predefined styles.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerVariants } from 'svelte-drawer';
+  import type { DrawerVariantsProps } from 'svelte-drawer';
+  
+  const variantProps: DrawerVariantsProps = {
+    variant: 'sheet',
+    class: 'custom-class',
+    trapFocus: true,
+  };
+</script>
+
+<Drawer open>
+  <DrawerVariants {...variantProps}>
+    <!-- content -->
+  </DrawerVariants>
+</Drawer>
+```
+
+### DrawerPortalProps
+
+Props for the `DrawerPortal` component.
+
+```typescript
+interface DrawerPortalProps {
+  container?: HTMLElement | string;
+}
+```
+
+**Use when:** Manually controlling where the drawer is rendered in the DOM.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerPortal } from 'svelte-drawer';
+  
+  const portalProps = {
+    container: '#portal-target', // or HTMLElement reference
+  };
+</script>
+
+<Drawer open>
+  <DrawerPortal {...portalProps}>
+    <!-- content -->
+  </DrawerPortal>
+</Drawer>
+```
+
+### DrawerHeaderProps
+
+Props for the `DrawerHeader` component.
+
+```typescript
+interface DrawerHeaderProps {
+  title?: string;
+  description?: string;
+  showCloseButton?: boolean;
+  onClose?: () => void;
+  class?: string;
+}
+```
+
+**Use when:** Adding a styled header section with title, description, and close button.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerHeader } from 'svelte-drawer';
+  import type { DrawerHeaderProps } from 'svelte-drawer';
+  
+  let open = true;
+  
+  const headerProps: DrawerHeaderProps = {
+    title: 'Settings',
+    description: 'Manage your preferences',
+    showCloseButton: true,
+    onClose: () => { open = false; },
+    class: 'border-b',
+  };
+</script>
+
+<Drawer bind:open>
+  <DrawerHeader {...headerProps} />
+  <!-- content -->
+</Drawer>
+```
+
+### DrawerFooterProps
+
+Props for the `DrawerFooter` component.
+
+```typescript
+interface DrawerFooterProps {
+  class?: string;
+}
+```
+
+**Use when:** Adding a styled footer section to your drawer.
+
+**Example:**
+
+```svelte
+<script lang="ts">
+  import { Drawer, DrawerFooter } from 'svelte-drawer';
+</script>
+
+<Drawer open>
+  <!-- content -->
+  <DrawerFooter class="border-t p-4">
+    <button>Cancel</button>
+    <button>Save</button>
+  </DrawerFooter>
+</Drawer>
+```
+
+## Creating typed wrappers
+
+You can use these types to create strongly-typed wrapper components:
+
+```svelte
+<script lang="ts">
+  import { Drawer } from 'svelte-drawer';
+  import type { DrawerProps } from 'svelte-drawer';
+  
+  interface CustomDrawerProps extends DrawerProps {
+    customProp?: string;
+  }
+  
+  export let customProp: string | undefined = undefined;
+  export let open: boolean = false;
+  export let direction: DrawerProps['direction'] = 'bottom';
+  
+  // Rest of your props
+</script>
+
+<Drawer {open} {direction} {...$$restProps}>
+  <slot />
+</Drawer>
+```

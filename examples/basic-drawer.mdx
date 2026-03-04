@@ -1,0 +1,53 @@
+---
+title: 'Basic Drawer'
+description: 'Simple bottom drawer with open/close functionality'
+---
+
+# Basic Drawer
+
+The most straightforward implementation of Svelte Drawer. This example demonstrates a bottom drawer with basic open/close functionality and a drag handle.
+
+## What This Example Shows
+
+- Simple drawer trigger button
+- Bottom drawer with overlay
+- Drag handle for gesture control
+- Basic open/close state management
+
+## Code Example
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<button onclick={() => open = true}>
+	Open Drawer
+</button>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Drawer Content</h2>
+		<p>This is a drawer component.</p>
+		<button onclick={() => open = false}>Close</button>
+	</DrawerContent>
+</Drawer>
+```
+
+## Key Features
+
+- **Overlay**: Semi-transparent background with `bg-black/40` opacity
+- **Rounded corners**: Top corners rounded with `rounded-t-lg`
+- **Drag handle**: Visual indicator that the drawer can be dragged
+- **State binding**: Uses `bind:open` for two-way state management
+
+## Usage Notes
+
+- Click the overlay to close the drawer
+- Press Escape to close (enabled by default)
+- Drag the handle or content area to dismiss
+- The drawer animates smoothly on open/close

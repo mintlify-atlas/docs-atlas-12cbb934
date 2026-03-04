@@ -1,0 +1,77 @@
+---
+title: Introduction
+description: A gesture-driven drawer component for Svelte 5 with smooth animations and mobile-optimized touch handling
+---
+
+Svelte Drawer is a powerful, accessible drawer component for Svelte 5, inspired by [Vaul](https://github.com/emilkowalski/vaul). It provides a smooth, gesture-driven interface with comprehensive support for mobile touch interactions and keyboard navigation.
+
+<CardGroup cols={2}>
+  <Card title="Gesture-Driven" icon="hand-pointer">
+    Smooth animations with intuitive drag handling for both mouse and touch interactions
+  </Card>
+  <Card title="Mobile Optimized" icon="mobile-screen">
+    Advanced scroll prevention and touch handling optimized for mobile devices
+  </Card>
+  <Card title="Fully Accessible" icon="universal-access">
+    Complete keyboard navigation, focus management, and ARIA attributes
+  </Card>
+  <Card title="TypeScript Ready" icon="code">
+    Full TypeScript support with comprehensive type definitions
+  </Card>
+</CardGroup>
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="Animations & Interactions">
+    - Smooth animations with gesture-driven dragging (mouse & touch)
+    - Mobile-optimized drag handling with scroll prevention
+    - Snap points for iOS-like multi-height drawers
+    - Scrollable content areas with proper touch handling
+  </Accordion>
+  
+  <Accordion title="Flexible Positioning">
+    - Support for multiple directions: bottom, top, left, right
+    - Prebuilt variants: default, sheet, dialog, minimal, sidebar
+    - Drag handle component with auto-adaptive orientation
+    - Portal rendering to escape z-index conflicts
+  </Accordion>
+  
+  <Accordion title="Developer Experience">
+    - Optional header & footer components for quick setup
+    - Nested drawer support
+    - Full TypeScript support
+    - Customizable styling with Tailwind CSS
+    - Persistent state across page reloads
+  </Accordion>
+  
+  <Accordion title="Accessibility">
+    - Keyboard shortcuts (Escape to close, Tab navigation)
+    - Focus management (auto-focus, focus trap, focus restoration)
+    - Fully accessible with proper ARIA attributes
+    - Screen reader friendly
+  </Accordion>
+</AccordionGroup>
+
+## What Makes It Special?
+
+**Gesture-Driven Design**: Unlike traditional modal dialogs, Svelte Drawer responds naturally to user gestures. Drag down to dismiss, drag to snap points, or use keyboard shortcuts - it works the way users expect.
+
+**Mobile First**: Built with mobile in mind from the ground up. Touch interactions are smooth, scroll prevention works reliably, and the component feels native on mobile devices.
+
+**Flexible & Composable**: Use the low-level `Drawer`, `DrawerOverlay`, and `DrawerContent` components for full control, or leverage prebuilt variants and optional header/footer components for rapid development.
+
+## Live Demo
+
+Experience Svelte Drawer in action at [drawer.abhivarde.in](https://drawer.abhivarde.in)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install Svelte Drawer and set up your project
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Build your first drawer in under 5 minutes
+  </Card>
+</CardGroup>

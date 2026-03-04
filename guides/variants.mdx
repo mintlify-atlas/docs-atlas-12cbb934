@@ -1,0 +1,230 @@
+---
+title: 'Drawer Variants'
+description: 'Pre-styled drawer variants for common use cases'
+---
+
+## Overview
+
+The `DrawerVariants` component provides pre-styled drawer layouts for common use cases. Each variant comes with carefully designed defaults for positioning, sizing, and appearance.
+
+## Available Variants
+
+### Default
+
+Standard bottom drawer with gray background and rounded top corners.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="default">
+		<div class="p-6">
+			<DrawerHandle class="mb-6" />
+			<h2>Default Variant</h2>
+			<p>Standard gray bottom drawer with rounded corners.</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Styles:**
+- Gray background (`bg-gray-100`)
+- Rounded top corners (`rounded-t-[10px]`)
+- Fixed to bottom with auto height
+- Top margin for content spacing
+
+### Sheet
+
+iOS-style bottom sheet with clean, modern design.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="sheet">
+		<div class="p-6">
+			<DrawerHandle class="mb-6" />
+			<h2>iOS-style Sheet</h2>
+			<p>Clean and modern bottom sheet design.</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Styles:**
+- White background (`bg-white`)
+- Large rounded top corners (`rounded-t-3xl`)
+- 85% viewport height (`h-[85vh]`)
+- Heavy shadow for depth (`shadow-2xl`)
+
+### Dialog
+
+Center-positioned modal dialog style.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="dialog">
+		<div class="p-6">
+			<h2>Dialog Style</h2>
+			<p>Center-positioned modal dialog.</p>
+			<button onclick={() => open = false}>Close</button>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Styles:**
+- White background with rounded corners (`rounded-lg`)
+- Centered with auto margins (`fixed inset-0 m-auto`)
+- Max width of 512px (`max-w-lg`)
+- Max height of 90vh with auto fit height
+
+### Minimal
+
+Simple bottom drawer without extra styling.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="minimal">
+		<div class="p-6">
+			<h2>Minimal Variant</h2>
+			<p>Clean slate for custom styling.</p>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Styles:**
+- White background (`bg-white`)
+- No rounded corners or shadows
+- Fixed to bottom with auto height
+- Perfect for custom styling
+
+### Sidebar
+
+Full-height side navigation drawer.
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerVariants, DrawerHandle } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open direction="right">
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerVariants variant="sidebar">
+		<div class="p-6">
+			<DrawerHandle class="mb-4" />
+			<h2>Sidebar Navigation</h2>
+			<nav>
+				<a href="/">Home</a>
+				<a href="/about">About</a>
+			</nav>
+		</div>
+	</DrawerVariants>
+</Drawer>
+```
+
+**Styles:**
+- White background (`bg-white`)
+- Full height (`h-full`)
+- Max width of 384px (`max-w-sm`)
+- Heavy shadow (`shadow-2xl`)
+- Best used with `direction="left"` or `direction="right"`
+
+## Implementation
+
+The `DrawerVariants` component wraps `DrawerContent` with preset styles:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerVariants.svelte:18-29
+const variantStyles: Record<Variant, string> = {
+  default:
+    "bg-gray-100 flex flex-col rounded-t-[10px] mt-24 h-fit fixed bottom-0 left-0 right-0 outline-none",
+  sheet:
+    "bg-white flex flex-col rounded-t-3xl h-[85vh] fixed bottom-0 left-0 right-0 outline-none shadow-2xl",
+  dialog:
+    "bg-white flex flex-col rounded-lg h-fit max-h-[90vh] fixed inset-0 m-auto max-w-lg outline-none shadow-xl",
+  minimal:
+    "bg-white flex flex-col h-fit fixed bottom-0 left-0 right-0 outline-none",
+  sidebar:
+    "bg-white h-full w-full max-w-sm fixed top-0 bottom-0 outline-none shadow-2xl",
+};
+```
+
+## Custom Styling
+
+You can extend any variant with additional classes:
+
+```svelte
+<DrawerVariants variant="sheet" class="!bg-gray-50 !h-[70vh]">
+	<div class="p-6">
+		<h2>Custom Sheet</h2>
+		<p>With overridden styles.</p>
+	</div>
+</DrawerVariants>
+```
+
+<Note>
+  Use the `!` (important) prefix in Tailwind to override variant defaults
+</Note>
+
+## Variant Comparison
+
+| Variant | Position | Height | Background | Best For |
+|---------|----------|--------|------------|----------|
+| `default` | Bottom | Auto | Gray | General purpose |
+| `sheet` | Bottom | 85vh | White | Mobile sheets |
+| `dialog` | Center | Auto (max 90vh) | White | Modals, alerts |
+| `minimal` | Bottom | Auto | White | Custom designs |
+| `sidebar` | Side | Full | White | Navigation |
+
+## Using Without Variants
+
+You don't need to use `DrawerVariants` - you can style `DrawerContent` directly:
+
+```svelte
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<DrawerHandle class="mb-8" />
+		<h2>Custom Drawer</h2>
+		<p>Fully custom styling without variants.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer-variants">
+    Complete DrawerVariants API documentation
+  </Card>
+  <Card title="Styling Guide" icon="paintbrush" href="/guides/styling">
+    Learn how to customize drawer appearance
+  </Card>
+</CardGroup>

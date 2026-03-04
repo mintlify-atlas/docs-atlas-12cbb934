@@ -1,0 +1,164 @@
+---
+title: Storage utilities
+description: Persistent state management utilities for Svelte Drawer
+---
+
+The storage utilities provide functions to persist drawer state across page reloads using browser localStorage. These utilities are useful when you want to maintain the drawer's open/closed state and snap point position between sessions.
+
+## Use case
+
+Use these utilities when you need to:
+- Preserve drawer state across page reloads
+- Remember user's preferred drawer position
+- Maintain snap point selections between sessions
+- Create a more persistent user experience
+
+## Functions
+
+### saveDrawerState
+
+Saves the current drawer state to localStorage.
+
+```typescript
+saveDrawerState(key: string, open: boolean, snapPoint?: number): void
+```
+
+<ParamField path="key" type="string" required>
+  Unique identifier for the drawer state. This key is prefixed with `svelte-drawer-` in localStorage.
+</ParamField>
+
+<ParamField path="open" type="boolean" required>
+  Whether the drawer is currently open or closed.
+</ParamField>
+
+<ParamField path="snapPoint" type="number">
+  The current snap point index, if snap points are being used.
+</ParamField>
+
+#### Usage example
+
+```svelte
+<script>
+  import { Drawer, saveDrawerState } from 'svelte-drawer';
+  
+  let open = false;
+  let activeSnapPoint = 0;
+  
+  function handleOpenChange(isOpen) {
+    open = isOpen;
+    saveDrawerState('my-drawer', isOpen, activeSnapPoint);
+  }
+  
+  function handleSnapPointChange(point) {
+    activeSnapPoint = point;
+    saveDrawerState('my-drawer', open, point);
+  }
+</script>
+
+<Drawer 
+  bind:open 
+  snapPoints={[0.5, 0.75, 1]}
+  activeSnapPoint={activeSnapPoint}
+  onOpenChange={handleOpenChange}
+  onSnapPointChange={handleSnapPointChange}
+>
+  <!-- drawer content -->
+</Drawer>
+```
+
+### loadDrawerState
+
+Loads previously saved drawer state from localStorage.
+
+```typescript
+loadDrawerState(key: string): DrawerState | null
+```
+
+<ParamField path="key" type="string" required>
+  Unique identifier for the drawer state to load.
+</ParamField>
+
+**Returns:** An object containing `{ open: boolean, snapPoint?: number }` if state exists, or `null` if no state is found.
+
+#### Usage example
+
+```svelte
+<script>
+  import { Drawer, loadDrawerState } from 'svelte-drawer';
+  import { onMount } from 'svelte';
+  
+  let open = false;
+  let activeSnapPoint = 0;
+  
+  onMount(() => {
+    const saved = loadDrawerState('my-drawer');
+    if (saved) {
+      open = saved.open;
+      if (saved.snapPoint !== undefined) {
+        activeSnapPoint = saved.snapPoint;
+      }
+    }
+  });
+</script>
+
+<Drawer 
+  bind:open 
+  snapPoints={[0.5, 0.75, 1]}
+  activeSnapPoint={activeSnapPoint}
+>
+  <!-- drawer content -->
+</Drawer>
+```
+
+### clearDrawerState
+
+Removes saved drawer state from localStorage.
+
+```typescript
+clearDrawerState(key: string): void
+```
+
+<ParamField path="key" type="string" required>
+  Unique identifier for the drawer state to clear.
+</ParamField>
+
+#### Usage example
+
+```svelte
+<script>
+  import { clearDrawerState } from 'svelte-drawer';
+  
+  function resetDrawerState() {
+    clearDrawerState('my-drawer');
+    // Optionally reload the page or reset local state
+    window.location.reload();
+  }
+</script>
+
+<button on:click={resetDrawerState}>
+  Reset drawer state
+</button>
+```
+
+## Built-in persistence
+
+While these utilities are available for manual state management, Svelte Drawer also provides built-in persistence through props:
+
+```svelte
+<Drawer 
+  persistState={true}
+  persistKey="my-drawer"
+  persistSnapPoint={true}
+>
+  <!-- drawer content -->
+</Drawer>
+```
+
+The built-in persistence automatically handles saving and loading state using these utilities under the hood.
+
+## Notes
+
+- All functions safely handle server-side rendering (SSR) by checking for `window` availability
+- Errors are caught and logged as warnings to prevent breaking your application
+- The storage key is automatically prefixed with `svelte-drawer-` to avoid conflicts
+- State is stored as JSON in localStorage

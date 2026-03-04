@@ -1,0 +1,311 @@
+---
+title: 'Keyboard Accessibility'
+description: 'Built-in keyboard shortcuts and focus management for accessible drawers'
+---
+
+## Overview
+
+Svelte Drawer provides comprehensive keyboard accessibility features out of the box, including keyboard shortcuts, focus management, and proper ARIA attributes.
+
+## Keyboard Shortcuts
+
+### Escape Key
+
+By default, pressing `Escape` closes the drawer:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Press Escape to close</h2>
+	</DrawerContent>
+</Drawer>
+```
+
+The implementation listens for the Escape key:
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:145-150
+function handleKeydown(e: KeyboardEvent) {
+  if (open && closeOnEscape && e.key === "Escape") {
+    e.preventDefault();
+    closeDrawer();
+  }
+}
+```
+
+### Disabling Escape Key
+
+You can disable the Escape key behavior:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open closeOnEscape={false}>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Cannot close with Escape</h2>
+		<p>User must click close button or overlay.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+<Warning>
+  Only disable `closeOnEscape` if you provide an alternative way to close the drawer
+</Warning>
+
+### Overlay Shortcuts
+
+The overlay responds to `Enter` and `Space` keys when focused:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerOverlay.svelte:29-34
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    drawer.closeDrawer();
+  }
+}
+```
+
+## Focus Management
+
+### Auto-Focus
+
+When the drawer opens, focus is automatically moved to the first focusable element:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:191-202
+$effect(() => {
+  if (drawer.open && trapFocus && contentElement) {
+    tick().then(() => {
+      const focusable = getFocusableElements();
+      if (focusable[0]) {
+        focusable[0].focus({ preventScroll: true });
+      } else {
+        contentElement?.focus({ preventScroll: true });
+      }
+    });
+  }
+});
+```
+
+Focusable elements include:
+- Links with `href` attribute
+- Buttons (not disabled)
+- Form inputs, textareas, selects (not disabled)
+- Elements with `tabindex` (except `-1`)
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:164-171
+function getFocusableElements(): HTMLElement[] {
+  if (!contentElement) return [];
+  return Array.from(
+    contentElement.querySelectorAll(
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ) as HTMLElement[];
+}
+```
+
+### Focus Trap
+
+By default, focus is trapped inside the drawer - pressing `Tab` cycles through focusable elements:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Focus Trapped</h2>
+		<button>First Button</button>
+		<button>Second Button</button>
+		<button>Last Button</button>
+		<!-- Tab wraps from last to first -->
+	</DrawerContent>
+</Drawer>
+```
+
+The focus trap implementation:
+
+```typescript /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:173-189
+function handleFocusTrap(e: KeyboardEvent) {
+  if (!trapFocus || !drawer.open || e.key !== "Tab") return;
+
+  const focusable = getFocusableElements();
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+```
+
+### Disabling Focus Trap
+
+You can disable focus trapping if you need keyboard navigation outside the drawer:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<Drawer bind:open>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent trapFocus={false} class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+		<h2>Tab navigation not restricted</h2>
+		<p>You can tab to elements outside the drawer.</p>
+	</DrawerContent>
+</Drawer>
+```
+
+<Note>
+  The `trapFocus` prop is on `DrawerContent`, not on the root `Drawer` component
+</Note>
+
+### Focus Restoration
+
+When the drawer closes, focus is automatically restored to the element that was focused before the drawer opened:
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:94-96
+if (open) {
+  visible = true;
+  previouslyFocusedElement = document.activeElement as HTMLElement;
+```
+
+```typescript /home/daytona/workspace/source/src/lib/components/Drawer.svelte:125-128
+if (previouslyFocusedElement) {
+  previouslyFocusedElement.focus();
+  previouslyFocusedElement = null;
+}
+```
+
+## ARIA Attributes
+
+The drawer includes proper ARIA attributes for screen readers:
+
+```svelte /home/daytona/workspace/source/src/lib/components/DrawerContent.svelte:214-222
+<div
+  bind:this={contentElement}
+  class={className}
+  style="transform: {getTransform()}; z-index: 50; touch-action: none;"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  onpointerdown={onPointerDown}
+  ontouchstart={onPointerDown}
+```
+
+- `role="dialog"` - Identifies the drawer as a dialog
+- `aria-modal="true"` - Indicates the drawer is modal
+- `tabindex="-1"` - Allows programmatic focus without tab navigation
+
+The overlay also includes ARIA attributes:
+
+```svelte /home/daytona/workspace/source/src/lib/components/DrawerOverlay.svelte:37-47
+<div
+  class="fixed inset-0 bg-black/40 cursor-pointer {blurClass()} {className}"
+  style="opacity: {drawer.overlayOpacity.current}; z-index: 40;"
+  onclick={drawer.closeDrawer}
+  onkeydown={handleKeydown}
+  role="button"
+  tabindex="0"
+  aria-label="Close drawer"
+  {...restProps}
+></div>
+```
+
+## Complete Example
+
+Here's a fully accessible drawer with all features:
+
+```svelte
+<script>
+	import { Drawer, DrawerOverlay, DrawerContent, DrawerHandle, DrawerHeader } from '@abhivarde/svelte-drawer';
+
+	let open = $state(false);
+</script>
+
+<button onclick={() => open = true}>
+	Open Accessible Drawer
+</button>
+
+<Drawer bind:open closeOnEscape={true}>
+	<DrawerOverlay class="fixed inset-0 bg-black/40" />
+	<DrawerContent trapFocus={true} class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg">
+		<DrawerHeader 
+			title="Accessible Drawer" 
+			description="Fully keyboard accessible"
+			showCloseButton={true}
+		/>
+		<div class="p-4">
+			<button>First Button</button>
+			<button>Second Button</button>
+			<button onclick={() => open = false}>Close</button>
+		</div>
+	</DrawerContent>
+</Drawer>
+```
+
+## Keyboard Navigation Summary
+
+| Key | Action | Can Disable |
+|-----|--------|-------------|
+| `Escape` | Close drawer | `closeOnEscape={false}` |
+| `Tab` | Next focusable element | `trapFocus={false}` |
+| `Shift+Tab` | Previous focusable element | `trapFocus={false}` |
+| `Enter` (on overlay) | Close drawer | No |
+| `Space` (on overlay) | Close drawer | No |
+
+## Best Practices
+
+<Tip>
+  Always provide a visible close button in addition to keyboard shortcuts
+</Tip>
+
+<Tip>
+  Keep focus trap enabled (default) for better accessibility
+</Tip>
+
+<Tip>
+  Test your drawer with keyboard-only navigation (no mouse)
+</Tip>
+
+<Warning>
+  If you disable `closeOnEscape`, ensure there's an obvious way to close the drawer
+</Warning>
+
+<Note>
+  Focus management works automatically - you don't need to write any additional code
+</Note>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api/drawer">
+    Complete prop documentation
+  </Card>
+  <Card title="DrawerContent API" icon="code" href="/api/drawer-content">
+    Focus trap and accessibility props
+  </Card>
+</CardGroup>

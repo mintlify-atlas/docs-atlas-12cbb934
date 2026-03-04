@@ -1,0 +1,238 @@
+---
+title: 'DrawerPortal'
+description: 'Portal rendering component to escape z-index conflicts'
+icon: 'portal-enter'
+---
+
+## Overview
+
+The `DrawerPortal` component renders its children in a portal at the end of the document body (or a custom container). This helps avoid z-index conflicts in complex layouts with nested stacking contexts.
+
+**Note:** You typically don't use this component directly. Instead, use the `portal` prop on the `Drawer` component, which handles portal rendering automatically.
+
+## Props
+
+<ParamField path="container" type="HTMLElement | string">
+  Custom portal container element or CSS selector. If not provided, creates a new div and appends it to `document.body`.
+  
+  ```svelte
+  <!-- Use custom container -->
+  <DrawerPortal container="#custom-portal">
+    <!-- drawer content -->
+  </DrawerPortal>
+  
+  <div id="custom-portal"></div>
+  ```
+</ParamField>
+
+## Usage via Drawer Component
+
+**Recommended approach:**
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<!-- Enable portal rendering -->
+<Drawer bind:open portal={true}>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Portal Drawer</h2>
+    <p>This drawer is rendered in a portal at the end of the body.</p>
+  </DrawerContent>
+</Drawer>
+```
+
+## Custom Portal Container
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<!-- Render into custom container -->
+<Drawer bind:open portal={true} portalContainer="#custom-portal">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Custom Portal Container</h2>
+  </DrawerContent>
+</Drawer>
+
+<!-- Portal container must exist in DOM -->
+<div id="custom-portal"></div>
+```
+
+## Direct Usage (Advanced)
+
+While not recommended, you can use `DrawerPortal` directly:
+
+```svelte
+<script>
+  import { DrawerPortal } from '@abhivarde/svelte-drawer';
+</script>
+
+<DrawerPortal>
+  <div class="my-portaled-content">
+    This content is rendered in a portal
+  </div>
+</DrawerPortal>
+```
+
+## How It Works
+
+1. **On mount**: Creates a portal container div with `data-drawer-portal` attribute
+2. **Appends to body**: The portal container is added to the end of `document.body`
+3. **Renders children**: Drawer content is rendered inside the portal
+4. **On unmount**: Cleans up the portal container
+
+### Portal Styling
+
+The portal container automatically receives:
+
+```css
+[data-drawer-portal] {
+  position: relative;
+  z-index: 9999;
+}
+```
+
+This ensures portaled content appears above most page content.
+
+## When to Use Portals
+
+Use portal rendering when:
+
+- **Complex z-index layouts**: You have nested stacking contexts that interfere with drawer visibility
+- **Third-party components**: External libraries create their own stacking contexts
+- **Overflow hidden**: Parent containers have `overflow: hidden` that clips the drawer
+- **Fixed positioning conflicts**: Multiple fixed elements create layering issues
+- **Modals inside scrollable areas**: Drawers inside containers with `overflow-y: auto`
+
+## When to Avoid Portals
+
+Skip portals when:
+
+- **Simple layouts**: Your app doesn't have complex z-index issues
+- **Performance**: Portals have a slight overhead (usually negligible)
+- **SSR concerns**: Portals only work client-side (handled automatically)
+
+## Examples
+
+### Drawer Inside Modal
+
+```svelte
+<script>
+  let modalOpen = $state(false);
+  let drawerOpen = $state(false);
+</script>
+
+<!-- Modal with z-index issues -->
+<div class="modal" style="z-index: 1000">
+  <button onclick={() => drawerOpen = true}>Open Drawer</button>
+  
+  <!-- Without portal, drawer might be hidden behind modal -->
+  <!-- With portal, drawer renders outside modal's stacking context -->
+  <Drawer bind:open={drawerOpen} portal={true}>
+    <DrawerOverlay class="fixed inset-0 bg-black/40" />
+    <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+      <h2>Drawer Inside Modal</h2>
+      <p>Portal ensures correct z-index</p>
+    </DrawerContent>
+  </Drawer>
+</div>
+```
+
+### Multiple Drawers with Portals
+
+```svelte
+<script>
+  let drawer1Open = $state(false);
+  let drawer2Open = $state(false);
+</script>
+
+<!-- Each drawer uses a unique portal container -->
+<Drawer bind:open={drawer1Open} portal={true} portalContainer="#portal-1">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Drawer 1</h2>
+  </DrawerContent>
+</Drawer>
+
+<Drawer bind:open={drawer2Open} portal={true} portalContainer="#portal-2">
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Drawer 2</h2>
+  </DrawerContent>
+</Drawer>
+
+<div id="portal-1"></div>
+<div id="portal-2"></div>
+```
+
+### Nested Drawers
+
+```svelte
+<Drawer bind:open={outerDrawerOpen}>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+    <h2>Outer Drawer</h2>
+    
+    <button onclick={() => innerDrawerOpen = true}>Open Inner Drawer</button>
+    
+    <!-- Inner drawer uses portal to appear above outer drawer -->
+    <Drawer bind:open={innerDrawerOpen} portal={true}>
+      <DrawerOverlay class="fixed inset-0 bg-black/40" />
+      <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg p-4">
+        <h2>Inner Drawer</h2>
+        <p>Rendered in portal above outer drawer</p>
+      </DrawerContent>
+    </Drawer>
+  </DrawerContent>
+</Drawer>
+```
+
+## Browser Compatibility
+
+Portals work in all modern browsers:
+
+- Chrome/Edge (all versions)
+- Firefox (all versions)
+- Safari (all versions)
+- Opera (all versions)
+
+## SSR Considerations
+
+Portals only work client-side because they depend on `document.body`. The component handles this automatically:
+
+1. Waits for `onMount` before creating portal
+2. Uses `mounted` state to conditionally render
+3. No hydration mismatches
+
+No special handling needed in SvelteKit or other SSR frameworks.
+
+## Accessibility
+
+Portals don't affect accessibility:
+
+- Screen readers navigate the DOM tree normally
+- Tab order remains logical (focus management handled by `DrawerContent`)
+- ARIA attributes work as expected
+
+## Performance
+
+Portal overhead is minimal:
+
+- Small one-time cost during mount
+- No runtime performance impact
+- DOM structure slightly more complex (negligible)
+
+## Related Components
+
+- [Drawer](/api/drawer) - Main wrapper with `portal` prop
+- [DrawerContent](/api/drawer-content) - Content container
+- [DrawerOverlay](/api/drawer-overlay) - Background overlay

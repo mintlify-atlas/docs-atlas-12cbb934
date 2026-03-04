@@ -1,0 +1,351 @@
+---
+title: 'DrawerFooter'
+description: 'Optional pre-styled footer component for drawers'
+icon: 'minus'
+---
+
+## Overview
+
+The `DrawerFooter` component provides a pre-styled footer section for drawers. It's entirely optional—you can build custom footers using regular HTML instead. Commonly used for action buttons, links, or supplementary information.
+
+## Props
+
+<ParamField path="class" type="string">
+  Additional CSS classes to customize the footer styling.
+  
+  ```svelte
+  <DrawerFooter class="bg-gray-50">
+    <!-- footer content -->
+  </DrawerFooter>
+  ```
+</ParamField>
+
+## Usage Examples
+
+### Basic Footer with Buttons
+
+```svelte
+<script>
+  import { Drawer, DrawerOverlay, DrawerContent, DrawerFooter } from '@abhivarde/svelte-drawer';
+
+  let open = $state(false);
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col">
+    <div class="p-4 flex-1">
+      <h2>Drawer Content</h2>
+      <p>Main content here...</p>
+    </div>
+    
+    <DrawerFooter>
+      <button 
+        onclick={() => open = false} 
+        class="px-4 py-2 bg-gray-200 rounded"
+      >
+        Cancel
+      </button>
+      <button class="px-4 py-2 bg-black text-white rounded">
+        Confirm
+      </button>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### Footer with Links
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col">
+    <div class="p-4 flex-1">
+      <h2>Terms of Service</h2>
+      <p>Read our terms...</p>
+    </div>
+    
+    <DrawerFooter class="bg-gray-50">
+      <div class="flex justify-between w-full">
+        <a href="/privacy" class="text-sm text-gray-600 hover:text-gray-900">
+          Privacy Policy
+        </a>
+        <a href="/terms" class="text-sm text-gray-600 hover:text-gray-900">
+          Terms
+        </a>
+      </div>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### Footer with Actions Snippet
+
+The component supports an `actions` snippet (though `children` is more common):
+
+```svelte
+<DrawerFooter>
+  {#snippet actions()}
+    <button class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+    <button class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+  {/snippet}
+</DrawerFooter>
+```
+
+### Styled Footer
+
+```svelte
+<!-- Light gray background -->
+<DrawerFooter class="bg-gray-50">
+  <button>Action</button>
+</DrawerFooter>
+
+<!-- Dark footer -->
+<DrawerFooter class="bg-gray-800 border-gray-700">
+  <button class="text-white">Action</button>
+</DrawerFooter>
+
+<!-- No border -->
+<DrawerFooter class="border-0">
+  <button>Simple Footer</button>
+</DrawerFooter>
+
+<!-- Extra padding -->
+<DrawerFooter class="p-6">
+  <button>More Spacious</button>
+</DrawerFooter>
+```
+
+### Complete Form Example
+
+```svelte
+<script>
+  let open = $state(false);
+  let formData = $state({ name: '', email: '' });
+  
+  function handleSubmit() {
+    console.log('Submitting:', formData);
+    open = false;
+  }
+</script>
+
+<Drawer bind:open>
+  <DrawerOverlay blur class="fixed inset-0 bg-black/20" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col max-h-[90vh]">
+    <!-- Content -->
+    <div class="p-4 flex-1 overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-4">Sign Up</h2>
+      
+      <form onsubmit={handleSubmit}>
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">Name</label>
+          <input 
+            type="text" 
+            bind:value={formData.name}
+            class="w-full px-3 py-2 border rounded"
+          />
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input 
+            type="email" 
+            bind:value={formData.email}
+            class="w-full px-3 py-2 border rounded"
+          />
+        </div>
+      </form>
+    </div>
+    
+    <!-- Footer with actions -->
+    <DrawerFooter class="bg-gray-50">
+      <div class="flex justify-end gap-2 w-full">
+        <button 
+          onclick={() => open = false}
+          class="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button 
+          onclick={handleSubmit}
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Submit
+        </button>
+      </div>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### With DrawerHeader
+
+```svelte
+<Drawer bind:open>
+  <DrawerOverlay class="fixed inset-0 bg-black/40" />
+  <DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col max-h-[80vh]">
+    <!-- Header -->
+    <DrawerHeader 
+      title="Confirmation" 
+      description="Please confirm your action"
+    />
+    
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto p-4">
+      <p>Are you sure you want to proceed?</p>
+    </div>
+    
+    <!-- Footer -->
+    <DrawerFooter>
+      <button 
+        onclick={() => open = false}
+        class="px-4 py-2 bg-gray-200 rounded"
+      >
+        No, Cancel
+      </button>
+      <button class="px-4 py-2 bg-red-600 text-white rounded">
+        Yes, Confirm
+      </button>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### Footer in Scrollable Drawer
+
+Important: Use flexbox layout to keep footer at bottom:
+
+```svelte
+<DrawerContent class="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg flex flex-col max-h-[90vh]">
+  <!-- Scrollable content -->
+  <div class="flex-1 overflow-y-auto p-4">
+    <h2>Long Content</h2>
+    <p>Lots of text...</p>
+    <!-- More content -->
+  </div>
+  
+  <!-- Footer stays at bottom -->
+  <DrawerFooter class="mt-auto">
+    <button>Action</button>
+  </DrawerFooter>
+</DrawerContent>
+```
+
+### Action Buttons Pattern
+
+```svelte
+<!-- Right-aligned actions -->
+<DrawerFooter>
+  <div class="flex justify-end gap-3 w-full">
+    <button class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+    <button class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+  </div>
+</DrawerFooter>
+
+<!-- Centered action -->
+<DrawerFooter>
+  <div class="flex justify-center w-full">
+    <button class="px-6 py-2 bg-black text-white rounded-full">
+      Continue
+    </button>
+  </div>
+</DrawerFooter>
+
+<!-- Space between -->
+<DrawerFooter>
+  <div class="flex justify-between w-full">
+    <button class="text-red-600">Delete</button>
+    <div class="flex gap-2">
+      <button class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+    </div>
+  </div>
+</DrawerFooter>
+
+<!-- Stacked on mobile -->
+<DrawerFooter>
+  <div class="flex flex-col sm:flex-row gap-2 w-full">
+    <button class="flex-1 px-4 py-2 bg-gray-200 rounded">Cancel</button>
+    <button class="flex-1 px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
+  </div>
+</DrawerFooter>
+```
+
+## Default Styling
+
+The footer includes:
+
+- `border-t border-gray-200` - Top border separator
+- `p-4` - Padding on all sides
+- `mt-auto` - Pushes to bottom in flex layouts
+
+Children content is rendered directly, giving you full control over layout.
+
+## Layout Tips
+
+### Fixed Footer in Tall Drawer
+
+Use flexbox to ensure footer stays at bottom:
+
+```svelte
+<DrawerContent class="... flex flex-col max-h-[90vh]">
+  <div class="flex-1 overflow-y-auto p-4">
+    <!-- Scrollable content -->
+  </div>
+  <DrawerFooter>
+    <!-- Always at bottom -->
+  </DrawerFooter>
+</DrawerContent>
+```
+
+### Full-Width Actions
+
+Wrap children in container with `w-full`:
+
+```svelte
+<DrawerFooter>
+  <div class="flex gap-2 w-full">
+    <button class="flex-1">Cancel</button>
+    <button class="flex-1">Confirm</button>
+  </div>
+</DrawerFooter>
+```
+
+## When to Use
+
+Use `DrawerFooter` when:
+
+- You want consistent footer styling across drawers
+- You have action buttons (Cancel, Save, etc.)
+- You need a visually separated footer section
+
+Build a custom footer when:
+
+- You need complex layouts or custom styling
+- You're using a design system with specific patterns
+- The pre-styled footer doesn't fit your design
+
+## Alternative: Custom Footer
+
+You can build footers without this component:
+
+```svelte
+<DrawerContent class="... flex flex-col">
+  <div class="flex-1 p-4">
+    <p>Content...</p>
+  </div>
+  
+  <!-- Custom footer -->
+  <div class="border-t bg-white p-4 flex justify-end gap-2">
+    <button class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+    <button class="px-4 py-2 bg-black text-white rounded">Save</button>
+  </div>
+</DrawerContent>
+```
+
+## Related Components
+
+- [DrawerHeader](/api/drawer-header) - Optional header component
+- [DrawerContent](/api/drawer-content) - Content container
+- [Drawer](/api/drawer) - Main wrapper component
+- [DrawerVariants](/api/drawer-variants) - Pre-styled variants
