@@ -1,0 +1,101 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Svelte Drawer",
+  "projectDescription": "A drawer component library for Svelte 5, inspired by Vaul.",
+  "theme": "palm",
+  "primaryColor": "#FF3E00",
+  "lightColor": "#FF6B35",
+  "darkColor": "#CC3100",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/directions",
+              "guides/variants",
+              "guides/snap-points",
+              "guides/portal",
+              "guides/keyboard-accessibility",
+              "guides/persistent-state",
+              "guides/styling"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/basic-drawer",
+              "examples/side-drawer",
+              "examples/with-snap-points",
+              "examples/custom-variants",
+              "examples/nested-drawers"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Components",
+            "pages": [
+              "api/drawer",
+              "api/drawer-content",
+              "api/drawer-overlay",
+              "api/drawer-handle",
+              "api/drawer-variants",
+              "api/drawer-portal",
+              "api/drawer-header",
+              "api/drawer-footer"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api/storage-utilities"
+            ]
+          },
+          {
+            "group": "Types",
+            "pages": [
+              "api/typescript-types"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Gesture-driven dragging with smooth animations",
+    "Multiple directions (bottom, top, left, right)",
+    "Prebuilt variants (sheet, dialog, sidebar, minimal)",
+    "Snap points for iOS-like multi-height drawers",
+    "Portal rendering to escape z-index conflicts",
+    "Keyboard shortcuts and focus management",
+    "Persistent state across page reloads",
+    "Full TypeScript support"
+  ],
+  "publicApiSurface": [
+    "Drawer",
+    "DrawerContent",
+    "DrawerOverlay",
+    "DrawerHandle",
+    "DrawerVariants",
+    "DrawerPortal",
+    "DrawerHeader",
+    "DrawerFooter",
+    "saveDrawerState()",
+    "loadDrawerState()",
+    "clearDrawerState()"
+  ]
+}
